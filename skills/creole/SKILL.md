@@ -4,7 +4,7 @@ description: Creole, the agent's compact working language for thinking, notes an
 license: MIT
 compatibility: Automatic on Claude Code, Codex, Cursor, Qoder, omp and pi through hooks or an extension; the language each turn on OpenCode and at session start on Copilot CLI; on request on any other Agent Skills host, such as Claude.ai and the Claude API.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   threshold_percent: "60"
   headroom_tokens: "100000"
 ---

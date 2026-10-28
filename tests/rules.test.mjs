@@ -22,7 +22,7 @@ test('the Kimi manifest and OpenCode command point at files that exist', () => {
   assert.match(read('.opencode/command/creole.md'), /Use the `creole` skill/);
 });
 
-test('every host manifest names creole at 1.0.0 where it carries a version, and points at files that exist', () => {
+test('every host manifest names creole at the package version where it carries one, and points at files that exist', () => {
   const version = JSON.parse(read('package.json')).version;
   for (const p of ['.devin-plugin/plugin.json', '.qoder-plugin/plugin.json', '.cursor-plugin/plugin.json', '.github/plugin/plugin.json', 'plugin.json', '.grok-plugin/marketplace.json', '.github/plugin/marketplace.json']) {
     const m = JSON.parse(read(p));

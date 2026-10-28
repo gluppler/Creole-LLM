@@ -1,6 +1,6 @@
 {
   "name": "creole",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Training-free context compaction for coding agents: Creole, a compact working language for notes, plans and replies, plus compaction of long sessions into a small session graph of the task, the user's constraints and the current work.",
   "author": {
     "name": "Chew Zhan Hong"

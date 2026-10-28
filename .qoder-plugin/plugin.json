@@ -1,6 +1,6 @@
 {
   "name": "creole",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A compact working language for coding agents: fewer tokens, direct work, short replies, and compaction that keeps the task.",
   "author": {
     "name": "Chew Zhan Hong",
