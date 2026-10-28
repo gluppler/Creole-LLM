@@ -12,27 +12,5 @@
     "compression",
     "compaction",
     "skills"
-  ],
-  "userConfig": {
-    "headroom_tokens": {
-      "type": "number",
-      "title": "Compaction headroom (tokens)",
-      "description": "Compact once the context has grown this far past its smallest size (system prompt, tools, restored graph). Every request re-reads the whole context, so smaller is cheaper until re-reading files costs more. Empty: the skill's headroom_tokens (40000).",
-      "min": 5000
-    },
-    "threshold_percent": {
-      "type": "number",
-      "title": "Compression threshold (%)",
-      "description": "Never let the session grow past this share of the context window before compacting. Empty: the skill's threshold_percent (60).",
-      "min": 10,
-      "max": 95
-    },
-    "context_window_tokens": {
-      "type": "number",
-      "title": "Context window size (tokens)",
-      "description": "The model's context window, for hosts that don't report it (Claude Code's function hooks read it themselves). Use 1000000 for 1M-context models.",
-      "default": 200000,
-      "min": 1000
-    }
-  }
+  ]
 }

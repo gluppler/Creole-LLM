@@ -122,17 +122,18 @@ Tiers are defined in [INSTALL.md](INSTALL.md).
 
 | Setting | Default / behavior |
 |---|---|
-| `headroom_tokens` / `CREOLE_HEADROOM_TOKENS` | 100000; compact once the context has grown this far past its smallest size (below 100k, the window's share binds) |
-| `threshold_percent` / `CREOLE_THRESHOLD_PERCENT` | 60; never let the context pass this share of the window first |
-| `context_window_tokens` / `CREOLE_CONTEXT_WINDOW_TOKENS` | For routes without a host-reported window |
+| `CREOLE_HEADROOM_TOKENS` | 100000; compact once the context has grown this far past its smallest size (below 100k, the window's share binds) |
+| `CREOLE_THRESHOLD_PERCENT` | 60; never let the context pass this share of the window first |
+| `CREOLE_CONTEXT_WINDOW_TOKENS` | For routes without a host-reported window |
 | `CREOLE_MAX_WORDS` | 250; the graph's target, soft after one correction |
 | `CREOLE_LANGUAGE` | On; `off` removes the language and its work and reply rules |
 | `CREOLE_WIKI` | On; `off` stops the session wiki and the codebase map, and deletes nothing |
 | `CREOLE_AUTO_COMPACT=0` | Stops the compactions the omp extension starts |
 | `CREOLE_CHECKPOINT` | `graph`; `natural` and `proposal` exist for comparison experiments only |
 
-Each setting comes from its `CREOLE_*` variable, then the plugin option, then the
-skill's frontmatter, then the default. Claude Code's own auto-compaction settings win
+Nothing to configure: the defaults adapt on their own (an unset headroom grows when
+compactions come close together and shrinks back). To override one, set its `CREOLE_*`
+environment variable. Claude Code's own auto-compaction settings win
 over Creole's. Each compaction says what it did, or why Creole could not and the host
 compacted instead; `--debug-file <path>` logs every turn, compaction and subagent merge.
 
