@@ -206,7 +206,8 @@ folder. Uninstall: delete the copied file or folder.
 | Data | Where | Removed by uninstall |
 |---|---|---|
 | Session records (Claude Code) | `user:<session id>` entries in the plugin's file under `~/.claude/plugins/store/` | Unverified; delete by hand with Claude Code closed |
-| Session records (command hooks) | `sessions/<session id>/` under `CLAUDE_PLUGIN_DATA`, then `PLUGIN_DATA`, else `~/.creole` (Codex: its plugin data folder above) | No; delete by hand with the agent closed |
+| Session records (command hooks: Codex, Cursor, Qoder) | `sessions/<session id>/` under `CLAUDE_PLUGIN_DATA`, then `PLUGIN_DATA`, else `~/.creole` (Codex: its plugin data folder above) | No; delete by hand with the agent closed |
+| Copilot CLI, OpenCode, rules-file agents | Nothing: Creole only adds its rules | Nothing to remove |
 | Memory-file backups from `/creole compress` | `backups/` under the agent shell's `CLAUDE_PLUGIN_DATA`, then `PLUGIN_DATA`, else `~/.creole` (the script prints the path) | No; Creole never removes them |
 | Host transcripts and provider logs | The host's and the provider's own stores | No; outside Creole |
 

@@ -1,9 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { FACTS, grade, score } from '../experiments/language/decode.mjs';
-import { HUMAN, MEANING, meaningLost, PAYLOADS, payloadKept, readable } from '../experiments/language/meaning.mjs';
-import { STATE } from '../experiments/language/poll.mjs';
+import { FACTS, grade, HUMAN, MEANING, meaningLost, PAYLOADS, payloadKept, readable, score, STATE } from '../experiments/language/meaning.mjs';
 import { graphSkill, languageContext, wordCount } from '../lib/creole-graph.mjs';
 
 const lost = (text) => Object.entries(grade(text)).filter(([, ok]) => !ok).map(([k]) => k);

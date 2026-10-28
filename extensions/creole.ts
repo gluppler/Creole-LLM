@@ -31,6 +31,7 @@ import {
   redactSecrets,
   reinjectContext,
   renderGraph,
+  replayBudget,
   settingsNotice,
   skillNotice,
   triggerContext,
@@ -107,9 +108,15 @@ export default function creole(pi: ExtensionAPI) {
     project: true,
   });
   let state = fresh();
-  // The user's messages and the graph, or null past half the headroom (about 4 characters a token),
-  // so the work keeps the other half. With a gap, it says some messages are missing.
-  const restore = () => reinjectContext(renderGraph(state.graph), state.users, cfg.headroom * 2, state.gap);
+  // The user's messages and the graph, or null past the replay budget (replayBudget). With a gap, it
+  // says some messages are missing.
+  const restore = () =>
+    reinjectContext(
+      renderGraph(state.graph),
+      state.users,
+      replayBudget({ window: state.window || cfg.window, threshold: cfg.threshold, floor: state.floor, headroom: cfg.headroom }),
+      state.gap,
+    );
 
   // A new, resumed, forked or rewound session: its messages so far come from omp's record of the
   // branch. Where the host can't list them they are unknown, and no restore calls the rest complete.

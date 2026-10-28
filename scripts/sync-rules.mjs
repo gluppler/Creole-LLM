@@ -4,11 +4,12 @@
 //   node scripts/sync-rules.mjs          write every file
 //   node scripts/sync-rules.mjs --check  exit 1 if any file differs from the skill
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { languageContext } from '../lib/creole-graph.mjs';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DESCRIPTION = 'Creole, a compact working language with direct work rules and short replies';
 
 // Path and the frontmatter each agent's rules format needs; the body is the same everywhere.
@@ -28,7 +29,7 @@ export function rulesText(skill) {
   return `${body.trimEnd()}\n`;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const text = rulesText(readFileSync(join(ROOT, 'skills/creole/SKILL.md'), 'utf8'));
   const check = process.argv.includes('--check');
   const stale = [];

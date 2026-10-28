@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, w
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { applyUpdate, emptyGraph, extractUpdate } from '../lib/creole-core.mjs';
+import { applyUpdate, emptyGraph, extractUpdate, lock, unlock } from '../lib/creole-core.mjs';
 import { handle } from '../lib/creole-hooks.mjs';
 
 test('hooks: pending checkpoints do not retrigger when token usage oscillates within the turn', (t) => {
@@ -114,6 +114,27 @@ test('hooks: a live session lock is skipped and an abandoned lock recovers', (t)
   const old = new Date(Date.now() - 31000);
   utimesSync(lock, old, old);
   assert.ok(handle(input, env)?.hookSpecificOutput.additionalContext);
+});
+
+test('lock: one hook at a time removes an abandoned lock; a dead stealer is cleared', (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'creole-lock-steal-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const held = join(dir, 'users.lock');
+  const old = new Date(Date.now() - 31000);
+  mkdirSync(held);
+  utimesSync(held, old, old);
+  // Another hook is removing it now: this one neither takes the lock nor deletes it.
+  mkdirSync(`${held}.steal`);
+  assert.equal(lock(held), false);
+  assert.ok(existsSync(held), 'the lock another hook is stealing stays');
+  // That stealer died: its steal lock is old too, and it is cleared, then the abandoned lock is taken.
+  utimesSync(`${held}.steal`, old, old);
+  assert.equal(lock(held, 200), true);
+  assert.ok(!existsSync(`${held}.steal`));
+  // Taken, the lock is fresh, so a second hook waits instead of removing it.
+  assert.equal(lock(held), false);
+  unlock(held);
+  assert.ok(!existsSync(held));
 });
 
 test('hooks: long tool loops trigger once without replacing tool results', (t) => {

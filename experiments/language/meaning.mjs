@@ -126,3 +126,26 @@ export const readable = (text) => {
   return Boolean(t) && t.split(/(?<=[.?!])\s+/).every((s) => /^[A-Z"'`]/.test(s) && /[.?!]["'`)]?$/.test(s)) &&
     !/->|;|\s!?=\s|^[a-z]\w*:\s/m.test(t);
 };
+
+// The retry-task state every encoding is checked against, and its 14 facts: a grader that runs no model.
+export const STATE = `Task: add retry with exponential backoff to the HTTP fetch client in src/http.ts (TypeScript, Node 22, tests in Vitest). The user's constraints, in their words: "at most 3 attempts" and "no new dependencies". Done so far: a withRetry wrapper in src/http.ts that waits 100 ms before the second attempt and doubles the wait each time. Rejected: the axios-retry package, because of the no-new-dependencies rule. Open problem: the test backoff in tests/retry.test.ts fails with "expected 3 attempts, received 1". Likely cause, not yet confirmed: the catch block in withRetry rethrows the error instead of retrying. Next step: change that catch block, then run npx vitest run retry.`;
+
+const lineWith = (text, re) => text.split('\n').filter((l) => re.test(l));
+export const FACTS = {
+  file: (t) => /src\/http\.ts/.test(t),
+  exponentialBackoff: (t) => /exponential/i.test(t) && /back-?off/i.test(t),
+  maxThree: (t) => /(at most|max(imum)?|up to|no more than|limit(ed)?( of| to)?|cap(ped)?( at)?)\s*(of\s*)?(3|three)\b|\b(3|three) attempts? (max|maximum|at most|limit)|attempts?\s*(<=|≤)\s*3/i.test(t),
+  noNewDeps: (t) => /no (new|additional|extra|external) (npm )?(dependenc|package|librar|deps)|without (adding )?(any )?(new|additional) (dependenc|package|deps)|new dependenc(y|ies) (are )?(not allowed|forbidden|prohibited)|no-new-dependencies/i.test(t),
+  withRetry: (t) => /withRetry/.test(t),
+  wait100ms: (t) => /100\s?ms|100 millisecond/i.test(t),
+  doubles: (t) => /doubl|×\s?2|\bx\s?2\b|\*\s?2|\b2x\b|twice/i.test(t),
+  axiosRejected: (t) => lineWith(t, /axios-retry/).some((l) => /reject|not (be )?use|ruled out|avoid|exclud|dismiss|declin|violat|because|disallow|not allowed|can'?t|cannot|won'?t/i.test(l)),
+  testFile: (t) => /tests\/retry\.test\.ts/.test(t),
+  failure: (t) => /expected\s*3[^\n]{0,60}(received|got|but|only)\s*1\b/i.test(t),
+  rethrowCause: (t) => /re-?throw|throws? (the error )?again/i.test(t),
+  causeUnconfirmed: (t) => lineWith(t, /re-?throw|throws? (the error )?again/i).some((l) => /likely|suspect|probabl|hypothes|not (yet )?confirmed|unconfirmed|unverified|\bmay\b|might|possibl|\?|suspected|believed|appears/i.test(l)),
+  nextCommand: (t) => /npx vitest run retry/.test(t),
+  stack: (t) => /typescript/i.test(t) && /node(\.js)? ?22/i.test(t) && /vitest/i.test(t),
+};
+export const grade = (text) => Object.fromEntries(Object.entries(FACTS).map(([k, f]) => [k, f(text ?? '')]));
+export const score = (g) => Object.values(g).filter(Boolean).length;

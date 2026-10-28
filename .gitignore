@@ -38,9 +38,7 @@
 /experiments/*
 !/experiments/language/
 /experiments/language/*
-!/experiments/language/decode.mjs
 !/experiments/language/meaning.mjs
-!/experiments/language/poll.mjs
 
 # Rules for agents without Creole's hooks (written by scripts/sync-rules.mjs)
 !/.clinerules/

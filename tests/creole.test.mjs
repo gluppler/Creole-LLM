@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import {
   addUser, applyUpdate, compactedContext, config, contextUsage, degradedContext, emptyGraph, escapeDelimiters, evaluateTrigger, extractUpdate, loadGraph, loadState, parseGraph, readTail, redactSecrets, reinjectContext,
-  renderGraph, sessionDir, triggerLimit,
+  renderGraph, replayBudget, sessionDir, triggerLimit,
 } from '../lib/creole-core.mjs';
 import { checkCheckpoint, checkpointContext, config as graphConfig, languageContext, settingsNotice, skillMetadata } from '../lib/creole-graph.mjs';
 import { handle } from '../lib/creole-hooks.mjs';
@@ -81,6 +81,21 @@ test('evaluateTrigger fires once per crossing and re-arms only below the limit',
   assert.deepEqual([first.fire, first.armed], [true, false]);
   assert.equal(evaluateTrigger({ limit, tokens: 150000, armed: false }).fire, false);
   assert.equal(evaluateTrigger({ limit, tokens: 30000, armed: false }).armed, true);
+});
+
+test('replayBudget: the user\'s messages come back within half the room below the limit, so a restore never re-triggers', () => {
+  const cfg = { threshold: 60, headroom: 100000 };
+  // A 128k window compacts at 76.8k; with a 25k base, the messages (about 4 characters a token) leave half of the room.
+  const small = { ...cfg, window: 128000, floor: 25000 };
+  assert.equal(replayBudget(small), 103600);
+  assert.ok(small.floor + replayBudget(small) / 4 < triggerLimit(small), 'the restored session lands under its own limit');
+  for (const window of [200000, 272000, 1000000]) {
+    const c = { ...cfg, window, floor: 25000 };
+    assert.ok(c.floor + replayBudget(c) / 4 < triggerLimit(c), `${window} window`);
+    assert.ok(replayBudget(c) <= cfg.headroom * 2, 'never more than half the headroom');
+  }
+  assert.equal(replayBudget({ ...cfg, window: 200000, floor: 125000 }), 200000, 'a base past the share was measured late: ignored');
+  assert.equal(replayBudget({ ...cfg, window: 0, floor: null }), 200000, 'no window known yet');
 });
 
 test('triggerLimit: the base plus the headroom, capped by the share of the window', () => {

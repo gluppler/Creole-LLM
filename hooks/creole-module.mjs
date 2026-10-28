@@ -56,6 +56,7 @@ import {
   projectContext,
   redactSecrets,
   renderGraph,
+  replayBudget,
   settingsNotice,
   skillMetadata,
   skillNotice,
@@ -416,8 +417,8 @@ async function compact($, s, e, next) {
     instructions: e.instructions,
   });
   const spent = { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
-  // Half the headroom at most (about 4 characters a token), so the work keeps the other half.
-  const budget = s.headroom * 2;
+  // Half the room below Creole's limit (replayBudget), so the replacement lands well under it.
+  const budget = replayBudget({ window: s.window || s.cfg.window, threshold: s.cfg.threshold, floor: s.floor, headroom: s.headroom });
   // A record that cannot replace the conversation (unreadable, missing a message, or too long to
   // leave room for any graph), or no skill to write the graph from, means no fork is paid for.
   let why = s.skill ? declined(record, s, sid, budget) : { reason: 'skill-unavailable' };
