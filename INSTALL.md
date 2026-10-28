@@ -126,11 +126,13 @@ Kimi's own instructions.
 
 ## OpenCode
 
-**Tier: mock-tested.** Add the plugin to `opencode.json`:
+**Tier: mock-tested.** Add the npm package to `opencode.json` (OpenCode installs it):
 
 ```json
-{ "plugin": ["/path/to/Creole-LLM/.opencode/plugins/creole.mjs"] }
+{ "plugin": ["creole-llm"] }
 ```
+
+From a clone instead: `{ "plugin": ["/path/to/Creole-LLM/.opencode/plugins/creole.mjs"] }`.
 
 It adds Creole's rules to every turn's system prompt and registers the skill. For
 the command, copy `.opencode/command/creole.md` into `.opencode/command/`. Uninstall:

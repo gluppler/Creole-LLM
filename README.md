@@ -33,7 +33,9 @@ Other agents:
 | GitHub Copilot CLI | `copilot plugin marketplace add gluppler/Creole-LLM`, then `copilot plugin install creole@creole-llm` |
 | Devin CLI | `devin plugins install gluppler/Creole-LLM` |
 | Grok Build | `grok plugin install gluppler/Creole-LLM --trust` |
-| Codex, Cursor, Qoder, omp, pi, OpenCode | install from a clone: [INSTALL.md](INSTALL.md) |
+| OpenCode | add `"creole-llm"` to `plugin` in `opencode.json` |
+| npm (any tool that installs packages) | `npm install creole-llm` |
+| Codex, Cursor, Qoder, omp, pi | install from a clone: [INSTALL.md](INSTALL.md) |
 | Any agent with skills | `npx skills add gluppler/Creole-LLM` |
 | Any agent that reads `AGENTS.md` or a rules folder | copy [`AGENTS.md`](AGENTS.md), or the rules file for your agent |
 

@@ -11,6 +11,7 @@
   },
   "bugs": "https://github.com/gluppler/Creole-LLM/issues",
   "type": "module",
+  "main": "./.opencode/plugins/creole.mjs",
   "keywords": [
     "pi-package",
     "claude-code",
