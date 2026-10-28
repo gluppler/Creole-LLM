@@ -179,8 +179,17 @@ session, automatic compaction prompts and session records, as on Codex.
 
 ## Skills CLI
 
-**Tier: instruction.** `npx skills add gluppler/Creole-LLM` copies the skill into
-the agents the skills CLI supports; `npx skills remove creole` removes it.
+**Tier: instruction.** The [skills CLI](https://skills.sh) copies the Creole skill into
+the skills folder of many agents:
+
+```sh
+npx skills add gluppler/Creole-LLM
+```
+
+Pick the agent with `--agent`, and add `--global` to install for your user instead of
+the project. This installs the skill only: for the always-on rules, also add
+[`AGENTS.md`](AGENTS.md) or use one of the plugins above. Uninstall:
+`npx skills remove creole` (same `--agent` and `--global` flags as the install).
 
 ## Any other agent
 

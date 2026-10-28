@@ -1,4 +1,4 @@
-<h1 align="center">Creole</h1>
+<h1 align="center">creole-llm</h1>
 
 <p align="center">
   <em>Fewer tokens. Same work. The agent keeps what matters when the context fills up.</em>
@@ -26,13 +26,24 @@ claude plugin marketplace add gluppler/Creole-LLM
 claude plugin install creole@creole-llm
 ```
 
-Codex, omp, pi, Cursor, Gemini CLI, any other agent, uninstalling and the data Creole
-leaves behind: [INSTALL.md](INSTALL.md).
+Other agents:
+
+| Agent | Install |
+|---|---|
+| GitHub Copilot CLI | `copilot plugin marketplace add gluppler/Creole-LLM`, then `copilot plugin install creole@creole-llm` |
+| Devin CLI | `devin plugins install gluppler/Creole-LLM` |
+| Grok Build | `grok plugin install gluppler/Creole-LLM --trust` |
+| Codex, Cursor, Qoder, omp, pi, OpenCode | install from a clone: [INSTALL.md](INSTALL.md) |
+| Any agent with skills | `npx skills add gluppler/Creole-LLM` |
+| Any agent that reads `AGENTS.md` or a rules folder | copy [`AGENTS.md`](AGENTS.md), or the rules file for your agent |
+
+Every agent, uninstalling and the data Creole leaves behind: [INSTALL.md](INSTALL.md).
 
 ## What it does
 
-A plugin that makes a coding agent cheaper on long sessions without forgetting the
-task. No training, no GPU, no second model.
+creole-llm is a plugin that makes a coding agent cheaper on long sessions without
+forgetting the task, by teaching it Creole, a compact working language. No training,
+no GPU, no second model.
 
 1. **A compact working language.** The agent thinks, plans and replies in plain English
    words in the shape of code: one fact per line, no filler, every number and error kept.
@@ -43,6 +54,9 @@ task. No training, no GPU, no second model.
    what they learn back into it, so the main agent and its subagents share one wiki.
 4. **Works beside other plugins.** Another plugin's rules win for what they prescribe,
    and after each compaction the agent is told to reload the skills it had invoked.
+5. **Runs on 20+ agents.** Compaction on Claude Code, Codex, Cursor, Qoder, omp and pi;
+   the rules every turn on OpenCode and at session start on Copilot CLI; and the rules
+   file on every agent that reads `AGENTS.md` or a rules folder.
 
 ## Before / after
 
@@ -161,8 +175,10 @@ Where they live and how to delete them: [INSTALL.md](INSTALL.md#data-left-behind
 npm test
 ```
 
-Node 22.18 or later. Agents start at [AGENTS.md](AGENTS.md). The project proposal is in
-[thesis/](thesis/).
+Node 22.18 or later. Start at [CONTRIBUTING.md](CONTRIBUTING.md). The rules files for
+other agents are written from the skill: after editing `skills/creole/SKILL.md`, run
+`node scripts/sync-rules.mjs` (the tests fail while they differ). The project proposal
+is in [thesis/](thesis/).
 
 ## License
 
