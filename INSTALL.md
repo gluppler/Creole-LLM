@@ -1,19 +1,17 @@
 # Install
 
-Pick your agent below. Every route installs from a local checkout of this
-repository: replace `/path/to/Creole-LLM` with its absolute path. The hooks run
+Pick your agent below. Claude Code installs from GitHub; the other routes use a
+clone of this repository (`/path/to/Creole-LLM` below). The hooks run
 `node`, so Node.js 22.18 or newer must be on the PATH of the agent's
 non-interactive shell. Not listed? Use [any other agent](#any-other-agent).
 
-Each section names its tier. Release 1.0.0 supports one route, Claude Code; the
-others ship unsupported.
+Each section names its tier.
 
 | Tier | Meaning |
 |---|---|
 | live-verified | Observed in live sessions on the named host version |
-| mock-tested | Deterministic tests or a stand-in provider only, no live session |
-| template-unverified | A configuration template ships; it has not run on that host |
-| manual | Instructions only: no automatic compaction, sharing or storage |
+| mock-tested | Deterministic tests or a stand-in provider, no live session |
+| instruction | Creole's rules load every session through the agent's own rules file, in the format the compared plugins ship; no automatic compaction, sharing or storage |
 
 ## Claude Code
 
@@ -81,33 +79,116 @@ the extension stores nothing of its own.
 
 ## Pi
 
-**Tier: template-unverified.** `package.json` declares the same extension and
-skills under `pi` as under `omp`; pi itself has not been run. Install the
-checkout as a pi package by pi's own instructions, and remove it the same way.
+**Tier: mock-tested.** The same extension and skills as omp, declared under `pi` in
+`package.json`. Install the checkout as a pi package by pi's own instructions, and
+remove it the same way.
 
 ## Cursor
 
-**Tier: template-unverified.** `hooks/cursor-hooks.json` is a hooks template:
-replace `CREOLE_DIR` with the checkout's absolute path, then merge its `hooks`
-entries into `~/.cursor/hooks.json` (or a project's `.cursor/hooks.json`),
-keeping hooks you already have. Uninstall: remove those entries. Session records
-go to the [Node data folder](#data-left-behind).
+**Tier: instruction.** `.cursor/rules/creole.mdc` is an always-on project rule: copy
+it into your project's `.cursor/rules/`. For automatic compaction as well,
+`hooks/cursor-hooks.json` is a hooks template: replace `CREOLE_DIR` with the
+checkout's absolute path and merge its `hooks` entries into `~/.cursor/hooks.json`.
+Uninstall: delete the rule and remove those entries.
 
-## Gemini CLI
+## Windsurf, Cline, Kiro, Qoder
 
-**Tier: template-unverified.** `hooks/gemini-hooks.json` is a hooks template:
-replace `CREOLE_DIR` with the checkout's absolute path, then merge its `hooks`
-object into Gemini CLI's `settings.json`. Uninstall: remove those entries.
-Session records go to the [Node data folder](#data-left-behind).
+**Tier: instruction.** Copy the rule file into your project, or into the agent's
+global rules folder:
+
+| Agent | File |
+|---|---|
+| Windsurf | `.windsurf/rules/creole.md` |
+| Cline | `.clinerules/creole.md` (global: `~/.cline/rules/`) |
+| Kiro | `.kiro/steering/creole.md` |
+| Qoder | `.qoder/rules/creole.md` |
+
+Uninstall: delete the copied file.
+
+## GitHub Copilot
+
+**Tier: instruction.** Copy `.github/copilot-instructions.md` into your repository's
+`.github/` (Copilot CLI: `~/.copilot/copilot-instructions.md` for every project).
+
+## Gemini CLI and Qwen Code
+
+**Tier: instruction.** Both read `AGENTS.md` when it is set as a context file: copy
+this repository's `AGENTS.md` into your project and add it to `context.fileName` in
+the agent's `settings.json`. For automatic compaction as well on Gemini CLI,
+`hooks/gemini-hooks.json` is a hooks template: replace `CREOLE_DIR` with the
+checkout's absolute path and merge its `hooks` object into `settings.json`.
+
+## Kimi Code
+
+**Tier: instruction.** `.kimi-plugin/plugin.json` puts `AGENTS.md` into the system
+prompt every turn and lists the skill. Install the checkout as a Kimi plugin by
+Kimi's own instructions.
+
+## OpenCode
+
+**Tier: mock-tested.** Add the plugin to `opencode.json`:
+
+```json
+{ "plugin": ["/path/to/Creole-LLM/.opencode/plugins/creole.mjs"] }
+```
+
+It adds Creole's rules to every turn's system prompt and registers the skill. For
+the command, copy `.opencode/command/creole.md` into `.opencode/command/`. Uninstall:
+remove the entry.
+
+## GitHub Copilot CLI
+
+**Tier: mock-tested.** The plugin's `sessionStart` hook (`hooks/copilot-hooks.json`)
+gives the agent Creole's rules at the start of every session. Copilot reads hook
+output only there, so it gets no automatic compaction.
+
+```sh
+copilot plugin marketplace add gluppler/Creole-LLM
+copilot plugin install creole@creole-llm
+```
+
+Uninstall: `copilot plugin uninstall creole@creole-llm`.
+
+## Devin CLI
+
+**Tier: instruction.**
+
+```sh
+devin plugins install gluppler/Creole-LLM
+```
+
+Uninstall: `devin plugins remove creole`.
+
+## Grok Build
+
+**Tier: instruction.**
+
+```sh
+grok plugin install gluppler/Creole-LLM --trust
+```
+
+Then enable it in `/plugins`. Uninstall: `grok plugin uninstall creole`.
+
+## Cursor plugin and Qoder plugin
+
+**Tier: mock-tested.** `.cursor-plugin/plugin.json` and `.qoder-plugin/plugin.json`
+install the skill through each host's plugin installer, pointed at this repository or
+a clone of it, and run Creole's command hooks (`hooks/cursor-plugin-hooks.json`,
+`hooks/qoder-hooks.json`; the host fills in its plugin root): the rules every
+session, automatic compaction prompts and session records, as on Codex.
+
+## Skills CLI
+
+**Tier: instruction.** `npx skills add gluppler/Creole-LLM` copies the skill into
+the agents the skills CLI supports; `npx skills remove creole` removes it.
 
 ## Any other agent
 
-**Tier: manual.** OpenCode, and any agent that reads skills or `AGENTS.md`:
-copy `skills/creole/` into the agent's skills folder, or point the agent at
-[`skills/creole/SKILL.md`](skills/creole/SKILL.md) (this repository's
-[`AGENTS.md`](AGENTS.md) does so). The agent then works in the Creole language
-and can write session graphs, but nothing compacts the conversation, shares the
-graph with subagents or stores it. Uninstall: delete the copied folder.
+**Tier: instruction.** Agents that read `AGENTS.md` from the project (Amp, Zed,
+Jules, Goose, Junie, Factory Droid, Antigravity, the Codex IDE extension and others)
+get Creole's rules from this repository's [`AGENTS.md`](AGENTS.md): copy it into your
+project root. Agents that read skills: copy `skills/creole/` into their skills
+folder. Uninstall: delete the copied file or folder.
 
 ## Data left behind
 

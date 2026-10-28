@@ -1,0 +1,24 @@
+{
+  "name": "creole-llm",
+  "description": "A compact working language for coding agents: fewer tokens, direct work, short replies, and compaction that keeps the task.",
+  "owner": {
+    "name": "Chew Zhan Hong",
+    "url": "https://github.com/gluppler"
+  },
+  "plugins": [
+    {
+      "name": "creole",
+      "description": "A compact working language for coding agents: fewer tokens, direct work, short replies, and compaction that keeps the task.",
+      "source": "./",
+      "category": "productivity",
+      "tags": [
+        "context",
+        "compaction",
+        "tokens",
+        "productivity"
+      ],
+      "skills": "skills/",
+      "hooks": "hooks/copilot-hooks.json"
+    }
+  ]
+}

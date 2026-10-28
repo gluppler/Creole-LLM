@@ -1,0 +1,12 @@
+{
+  "name": "creole",
+  "description": "Creole, a compact working language for coding agents: fewer tokens, direct work, short replies.",
+  "homepage": "https://github.com/gluppler/Creole-LLM",
+  "license": "MIT",
+  "interface": {
+    "displayName": "Creole",
+    "shortDescription": "A compact working language: fewer tokens, direct work, short replies."
+  },
+  "skills": "./skills/",
+  "systemPromptPath": "./AGENTS.md"
+}

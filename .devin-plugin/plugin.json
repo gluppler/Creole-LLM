@@ -1,0 +1,18 @@
+{
+  "name": "creole",
+  "version": "1.0.0",
+  "description": "A compact working language for coding agents: fewer tokens, direct work, short replies, and compaction that keeps the task.",
+  "author": {
+    "name": "Chew Zhan Hong",
+    "url": "https://github.com/gluppler"
+  },
+  "homepage": "https://github.com/gluppler/Creole-LLM",
+  "repository": "https://github.com/gluppler/Creole-LLM",
+  "license": "MIT",
+  "keywords": [
+    "context",
+    "compaction",
+    "tokens",
+    "productivity"
+  ]
+}

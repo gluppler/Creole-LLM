@@ -7,11 +7,17 @@
 !/.claude-plugin/
 /.claude-plugin/types/
 !/.codex-plugin/
+!/.cursor-plugin/
+!/.devin-plugin/
+!/.grok-plugin/
+!/.qoder-plugin/
+!/plugin.json
 !/extensions/
 !/hooks/
 !/lib/
 !/skills/
 !/package.json
+!/scripts/
 !/tsconfig.json
 
 # Tests and the language fixtures they read
@@ -27,6 +33,7 @@
 !/tests/project.test.mjs
 !/tests/session-wiki.test.mjs
 !/tests/spy-fs.mjs
+!/tests/rules.test.mjs
 !/tests/transactions.test.mjs
 !/experiments/
 /experiments/*
@@ -36,7 +43,17 @@
 !/experiments/language/meaning.mjs
 !/experiments/language/poll.mjs
 
+# Rules for agents without Creole's hooks (written by scripts/sync-rules.mjs)
+!/.clinerules/
+!/.cursor/
+!/.kimi-plugin/
+!/.kiro/
+!/.opencode/
+!/.qoder/
+!/.windsurf/
+
 # Documentation, CI and the published proposal
+!/CONTRIBUTING.md
 !/.github/
 !/.gitignore
 !/AGENTS.md

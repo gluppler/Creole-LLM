@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/gluppler/Creole-LLM/actions/workflows/test.yml"><img src="https://github.com/gluppler/Creole-LLM/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
-  <img src="https://img.shields.io/badge/works%20with-7%20agents-111111?style=flat-square" alt="Works with 7 agents">
+  <img src="https://img.shields.io/badge/works%20with-20%2B%20agents-111111?style=flat-square" alt="Works with 20+ agents">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license"></a>
 </p>
 
@@ -110,11 +110,15 @@ copy.
 |---|---|---|
 | Claude Code 2.1.292 | function hooks (`hooks/creole-module.mjs`) | live-verified |
 | Codex 0.162.1 | command hooks | mock-tested |
-| Claude Code, without the module | command-hook fallback | mock-tested |
-| omp | extension (`extensions/creole.ts`) | mock-tested; no session wiki |
-| pi | the same extension | template-unverified |
-| Cursor, Gemini CLI | hook templates | template-unverified |
-| OpenCode and any agent that reads skills | the skill alone | manual |
+| omp, pi | extension (`extensions/creole.ts`) | mock-tested; no session wiki |
+| Windsurf, Cline, Kiro | their rules folders | instruction |
+| GitHub Copilot | `.github/copilot-instructions.md` | instruction |
+| Gemini CLI, Qwen Code, Kimi Code | `AGENTS.md` as context, `.kimi-plugin/` | instruction |
+| OpenCode | server plugin (`.opencode/plugins/creole.mjs`) | mock-tested |
+| Cursor, Qoder | plugins with Creole's hooks (or a rules file) | mock-tested |
+| GitHub Copilot CLI | plugin, rules at session start | mock-tested |
+| Devin CLI, Grok Build | their plugin installers | instruction |
+| Amp, Zed, Jules, Goose, Junie and any agent that reads `AGENTS.md` | `AGENTS.md` | instruction |
 
 Tiers are defined in [INSTALL.md](INSTALL.md).
 

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "node \"$PLUGIN_ROOT/hooks/creole-hook.mjs\" || exit 0",
+        "powershell": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:PLUGIN_ROOT/hooks/creole-hook.mjs\" }",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
