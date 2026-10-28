@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "creole-llm",
+  "description": "Training-free context compaction and a compact working language for coding agents.",
+  "owner": {
+    "name": "Chew Zhan Hong"
+  },
+  "plugins": [
+    {
+      "name": "creole",
+      "description": "Creole, a compact working language for notes, plans and replies, plus compaction of long sessions into a small session graph of the task, constraints and current work.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

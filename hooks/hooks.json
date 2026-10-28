@@ -1,0 +1,95 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const root=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(root)import(require('node:url').pathToFileURL(require('node:path').join(root,'hooks','creole-hook.mjs')).href).catch(()=>{})\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const root=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(root)import(require('node:url').pathToFileURL(require('node:path').join(root,'hooks','creole-hook.mjs')).href).catch(()=>{})\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const root=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(root)import(require('node:url').pathToFileURL(require('node:path').join(root,'hooks','creole-hook.mjs')).href).catch(()=>{})\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const root=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(root)import(require('node:url').pathToFileURL(require('node:path').join(root,'hooks','creole-hook.mjs')).href).catch(()=>{})\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const root=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(root)import(require('node:url').pathToFileURL(require('node:path').join(root,'hooks','creole-hook.mjs')).href).catch(()=>{})\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const root=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(root)import(require('node:url').pathToFileURL(require('node:path').join(root,'hooks','creole-hook.mjs')).href).catch(()=>{})\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const root=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(root)import(require('node:url').pathToFileURL(require('node:path').join(root,'hooks','creole-hook.mjs')).href).catch(()=>{})\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const root=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(root)import(require('node:url').pathToFileURL(require('node:path').join(root,'hooks','creole-hook.mjs')).href).catch(()=>{})\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "modules": [
+    "./creole-module.mjs"
+  ]
+}

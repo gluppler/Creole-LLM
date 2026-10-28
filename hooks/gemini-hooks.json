@@ -1,0 +1,48 @@
+{
+  "hooks": {
+    "BeforeAgent": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"CREOLE_DIR/hooks/creole-hook.mjs\"",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"CREOLE_DIR/hooks/creole-hook.mjs\"",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"CREOLE_DIR/hooks/creole-hook.mjs\"",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"CREOLE_DIR/hooks/creole-hook.mjs\"",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
+  }
+}

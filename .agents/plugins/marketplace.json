@@ -1,0 +1,20 @@
+{
+  "name": "creole-llm",
+  "interface": {
+    "displayName": "Creole LLM"
+  },
+  "plugins": [
+    {
+      "name": "creole",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

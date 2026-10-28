@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [
+      {
+        "command": "node \"CREOLE_DIR/hooks/creole-hook.mjs\"",
+        "timeout": 10
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "node \"CREOLE_DIR/hooks/creole-hook.mjs\"",
+        "timeout": 10
+      }
+    ],
+    "afterAgentResponse": [
+      {
+        "command": "node \"CREOLE_DIR/hooks/creole-hook.mjs\"",
+        "timeout": 10
+      }
+    ],
+    "sessionStart": [
+      {
+        "command": "node \"CREOLE_DIR/hooks/creole-hook.mjs\"",
+        "timeout": 10
+      }
+    ]
+  }
+}

@@ -1,0 +1,66 @@
+# Allowlist: everything is ignored unless listed below, so a secret, log or
+# scratch file can never be committed by accident.
+/*
+
+# The plugin
+!/.agents/
+!/.claude-plugin/
+/.claude-plugin/types/
+!/.codex-plugin/
+!/extensions/
+!/hooks/
+!/lib/
+!/skills/
+!/package.json
+!/tsconfig.json
+
+# Tests and the language fixtures they read
+!/tests/
+/tests/*
+!/tests/claude-module.test.mjs
+!/tests/compress.test.mjs
+!/tests/core-efficiency.test.mjs
+!/tests/creole.test.mjs
+!/tests/hooks-efficiency.test.mjs
+!/tests/language.test.mjs
+!/tests/omp-extension.test.mjs
+!/tests/project.test.mjs
+!/tests/session-wiki.test.mjs
+!/tests/spy-fs.mjs
+!/tests/transactions.test.mjs
+!/experiments/
+/experiments/*
+!/experiments/language/
+/experiments/language/*
+!/experiments/language/decode.mjs
+!/experiments/language/meaning.mjs
+!/experiments/language/poll.mjs
+
+# Documentation, CI and the published proposal
+!/.github/
+!/.gitignore
+!/AGENTS.md
+!/INSTALL.md
+!/LICENSE
+!/README.md
+!/thesis/
+/thesis/*
+!/thesis/ChewZhanHong_23018039_Proposal.docx
+!/thesis/ChewZhanHong_23018039_Proposal.pdf
+
+# Never committed, wherever they appear
+.DS_Store
+node_modules/
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+.npmrc
+*.log
+*.local.*
+credentials*
+secrets*
