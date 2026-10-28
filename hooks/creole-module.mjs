@@ -47,8 +47,10 @@ import {
   escapeDelimiters,
   extractUpdate,
   graphSkill,
+  IDLE_MS,
   languageContext,
   MAP_CHARS,
+  MAX_ALL_BYTES,
   MAX_SESSION_BYTES,
   mergeDelta,
   projectContext,
@@ -78,11 +80,6 @@ const INPUT_DOORS = new Set(['prompt', 'response', 'tool-result', 'tool-message'
 const THRASH_RESPONSES = 8;
 // The user's own words: typed or queued at the terminal, sent through Remote Control, or a -p turn.
 const HUMAN = new Set(['composer', 'bridge', 'sdk']);
-// Another session's record that ended and was then untouched this long goes at the next session start:
-// lazy cleanup, not timed erasure.
-const IDLE_MS = 30 * 86400000;
-// Every session's records together (docs/runtime-design.md), within the host's 4 MiB store.
-const MAX_ALL_BYTES = 3 * 1024 * 1024;
 // Room a record's messages and graph leave for its markers (gap, ended), which are never refused.
 const MARKER_BYTES = 64;
 // The scan's own limit is a second; this leaves time for starting Node.

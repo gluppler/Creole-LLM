@@ -26,10 +26,15 @@ compacts the conversation, shares the session graph with subagents or stores it
 | Storage, logs and command-hook dispatch | `lib/creole-core.mjs`, `lib/creole-hooks.mjs`, `hooks/creole-hook.mjs` |
 | Claude Code | `.claude-plugin/`, `hooks/creole-module.mjs` (function hooks), `hooks/hooks.json` (command-hook fallback) |
 | Codex | `.codex-plugin/`, `.agents/plugins/`, `hooks/codex-hooks.json` |
+| Cursor, Qoder | `.cursor-plugin/`, `.qoder-plugin/`, `hooks/cursor-plugin-hooks.json`, `hooks/qoder-hooks.json` |
+| GitHub Copilot CLI | `.github/plugin/`, `hooks/copilot-hooks.json` |
 | omp and pi | `package.json`, `extensions/creole.ts` |
-| Cursor and Gemini CLI templates | `hooks/cursor-hooks.json`, `hooks/gemini-hooks.json` |
+| OpenCode | `.opencode/plugins/creole.mjs`, `.opencode/command/creole.md` |
+| Devin, Grok Build, Kimi Code | `.devin-plugin/`, `.grok-plugin/` and `plugin.json`, `.kimi-plugin/` |
+| Rules for other agents | `AGENTS.md`, `.agents/rules/`, `.clinerules/`, `.cursor/rules/`, `.github/copilot-instructions.md`, `.kiro/`, `.qoder/rules/`, `.windsurf/`; written by `scripts/sync-rules.mjs` |
+| Hook templates for a manual setup | `hooks/cursor-hooks.json`, `hooks/gemini-hooks.json` |
 | Tests | `tests/`; language fixtures in `experiments/language/` |
 | Thesis material | `thesis/` |
 
-Checks: `npm test`. Installing into a live host, commits, pushes and publication
-need the user's approval.
+Checks: `npm test` (CI runs it on Node 22, 24 and 26). After editing the skill's
+Language section, run `node scripts/sync-rules.mjs`.

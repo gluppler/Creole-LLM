@@ -1,7 +1,7 @@
 {
   "name": "creole-llm",
   "version": "1.0.0",
-  "description": "Training-free context compaction for coding agents: Creole, a compact working language for notes, plans and replies, plus early compaction of long sessions into a small session graph of the task, the user's constraints and the current work.",
+  "description": "Training-free context compaction for coding agents: Creole, a compact working language for notes, plans and replies, plus compaction of long sessions into a small session graph of the task, the user's constraints and the current work.",
   "license": "MIT",
   "author": "Chew Zhan Hong",
   "homepage": "https://github.com/gluppler/Creole-LLM",
@@ -11,8 +11,19 @@
   },
   "bugs": "https://github.com/gluppler/Creole-LLM/issues",
   "type": "module",
-  "keywords": ["pi-package", "claude-code", "codex", "opencode", "agent", "context", "compaction", "tokens"],
-  "engines": { "node": ">=22.18" },
+  "keywords": [
+    "pi-package",
+    "claude-code",
+    "codex",
+    "opencode",
+    "agent",
+    "context",
+    "compaction",
+    "tokens"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
   "files": [
     ".agents/",
     ".claude-plugin/marketplace.json",
@@ -44,11 +55,19 @@
     "test": "node --test tests/*.test.mjs"
   },
   "omp": {
-    "extensions": ["./extensions/creole.ts"],
-    "skills": ["./skills"]
+    "extensions": [
+      "./extensions/creole.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
   },
   "pi": {
-    "extensions": ["./extensions/creole.ts"],
-    "skills": ["./skills"]
+    "extensions": [
+      "./extensions/creole.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
   }
 }

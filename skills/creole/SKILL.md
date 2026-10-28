@@ -2,7 +2,7 @@
 name: creole
 description: Creole, the agent's compact working language for thinking, notes and replies, and the session graph, the task and working state that replace the conversation at compaction and that the session's subagents share. Hooks apply the language from session start; load this skill when the user asks for Creole or the Creole language. Write the graph only when a CREOLE message asks for it, or when the user asks for a creole graph, a checkpoint, or to compress the session; never on your own initiative, except the delta a subagent shown the graph ends with. Rewrite a memory or instructions file in Creole only when the user asks to compress that file (`/creole compress <file>`).
 license: MIT
-compatibility: Automatic on Claude Code, Codex and omp through hooks or an extension, and on Cursor and Gemini CLI through the same command hooks; on request on any other Agent Skills host, such as OpenCode, Hermes, Claude.ai and the Claude API.
+compatibility: Automatic on Claude Code, Codex, Cursor, Qoder, omp and pi through hooks or an extension; the language each turn on OpenCode and at session start on Copilot CLI; on request on any other Agent Skills host, such as Claude.ai and the Claude API.
 metadata:
   version: "1.0.0"
   threshold_percent: "60"

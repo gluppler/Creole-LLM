@@ -2,7 +2,7 @@
   "name": "creole",
   "displayName": "Creole LLM",
   "version": "1.0.0",
-  "description": "Training-free context compaction for coding agents: Creole, a compact working language for notes, plans and replies, plus early compaction of long sessions into a small session graph of the task, the user's constraints and the current work.",
+  "description": "Training-free context compaction for coding agents: Creole, a compact working language for notes, plans and replies, plus compaction of long sessions into a small session graph of the task, the user's constraints and the current work.",
   "author": {
     "name": "Chew Zhan Hong"
   },
@@ -12,5 +12,7 @@
     "compression",
     "compaction",
     "skills"
-  ]
+  ],
+  "homepage": "https://github.com/gluppler/Creole-LLM",
+  "repository": "https://github.com/gluppler/Creole-LLM"
 }
