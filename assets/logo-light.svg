@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><defs>
+<filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0b1020" flood-opacity="0.18"/></filter>
+<radialGradient id="core" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9edf5"/></radialGradient>
+<radialGradient id="d0" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#ffb3d4"/><stop offset="0.72" stop-color="#ff6fae"/><stop offset="1" stop-color="#ff6fae"/></radialGradient>
+<radialGradient id="d1" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#a9c6ff"/><stop offset="0.72" stop-color="#4f8bff"/><stop offset="1" stop-color="#4f8bff"/></radialGradient>
+<radialGradient id="d2" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#9aeccb"/><stop offset="0.72" stop-color="#2fc98a"/><stop offset="1" stop-color="#2fc98a"/></radialGradient>
+<radialGradient id="d3" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#ffe299"/><stop offset="0.72" stop-color="#ffbf2f"/><stop offset="1" stop-color="#ffbf2f"/></radialGradient>
+<radialGradient id="d4" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#cdb6ff"/><stop offset="0.72" stop-color="#9a6bff"/><stop offset="1" stop-color="#9a6bff"/></radialGradient>
+</defs>
+<circle cx="256" cy="200" r="128" fill="none" stroke="#e5e7eb" stroke-width="2"/>
+<line x1="256" y1="200" x2="256.0" y2="72.0" stroke="#ff6fae" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round"/>
+<line x1="256" y1="200" x2="377.7" y2="160.4" stroke="#4f8bff" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round"/>
+<line x1="256" y1="200" x2="331.2" y2="303.6" stroke="#2fc98a" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round"/>
+<line x1="256" y1="200" x2="180.8" y2="303.6" stroke="#ffbf2f" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round"/>
+<line x1="256" y1="200" x2="134.3" y2="160.4" stroke="#9a6bff" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round"/>
+<g filter="url(#soft)"><circle cx="256" cy="200" r="30" fill="url(#core)"/></g>
+<circle cx="247" cy="194" r="4.2" fill="#1d2433"/>
+<circle cx="265" cy="194" r="4.2" fill="#1d2433"/>
+<circle cx="256" cy="209" r="4.2" fill="#1d2433"/>
+<path d="M247,194 L265,194 L256,209 Z" fill="none" stroke="#1d2433" stroke-width="2" stroke-linejoin="round"/>
+<g filter="url(#soft)"><circle cx="256.0" cy="72.0" r="46" fill="url(#d0)"/></g>
+<rect x="239.0" y="65.6" width="6.4" height="12.0" rx="3.2" fill="#141824" fill-opacity="0.85"/>
+<rect x="266.6" y="65.6" width="6.4" height="12.0" rx="3.2" fill="#141824" fill-opacity="0.85"/>
+<ellipse cx="241.3" cy="52.7" rx="12.0" ry="6.4" fill="#fff" fill-opacity="0.35" transform="rotate(-25 241.3 52.7)"/>
+<g filter="url(#soft)"><circle cx="377.7" cy="160.4" r="40" fill="url(#d1)"/></g>
+<rect x="362.9" y="154.8" width="5.6" height="10.4" rx="2.8" fill="#141824" fill-opacity="0.85"/>
+<rect x="386.9" y="154.8" width="5.6" height="10.4" rx="2.8" fill="#141824" fill-opacity="0.85"/>
+<ellipse cx="364.9" cy="143.6" rx="10.4" ry="5.6" fill="#fff" fill-opacity="0.35" transform="rotate(-25 364.9 143.6)"/>
+<g filter="url(#soft)"><circle cx="331.2" cy="303.6" r="44" fill="url(#d2)"/></g>
+<rect x="315.0" y="297.4" width="6.2" height="11.4" rx="3.1" fill="#141824" fill-opacity="0.85"/>
+<rect x="341.4" y="297.4" width="6.2" height="11.4" rx="3.1" fill="#141824" fill-opacity="0.85"/>
+<ellipse cx="317.2" cy="285.1" rx="11.4" ry="6.2" fill="#fff" fill-opacity="0.35" transform="rotate(-25 317.2 285.1)"/>
+<g filter="url(#soft)"><circle cx="180.8" cy="303.6" r="38" fill="url(#d3)"/></g>
+<rect x="166.7" y="298.2" width="5.3" height="9.9" rx="2.7" fill="#141824" fill-opacity="0.85"/>
+<rect x="189.5" y="298.2" width="5.3" height="9.9" rx="2.7" fill="#141824" fill-opacity="0.85"/>
+<ellipse cx="168.6" cy="287.6" rx="9.9" ry="5.3" fill="#fff" fill-opacity="0.35" transform="rotate(-25 168.6 287.6)"/>
+<g filter="url(#soft)"><circle cx="134.3" cy="160.4" r="42" fill="url(#d4)"/></g>
+<rect x="118.7" y="154.6" width="5.9" height="10.9" rx="2.9" fill="#141824" fill-opacity="0.85"/>
+<rect x="143.9" y="154.6" width="5.9" height="10.9" rx="2.9" fill="#141824" fill-opacity="0.85"/>
+<ellipse cx="120.8" cy="142.8" rx="10.9" ry="5.9" fill="#fff" fill-opacity="0.35" transform="rotate(-25 120.8 142.8)"/>
+<text x="256" y="438" text-anchor="middle" font-family="Avenir Next" font-weight="600" font-size="58" letter-spacing="-1" fill="#111827">creole-llm</text>
+<text x="256" y="474" text-anchor="middle" font-family="Avenir Next" font-weight="500" font-size="19" letter-spacing="4" fill="#6b7280">ONE GRAPH · EVERY AGENT</text>
+</svg>

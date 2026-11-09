@@ -1,4 +1,9 @@
-<h1 align="center">creole-llm</h1>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png">
+    <img src="assets/logo-light.png" alt="creole-llm" width="200">
+  </picture>
+</p>
 
 <p align="center">
   <em>Fewer tokens. Same work. The agent keeps what matters when the context fills up.</em>
