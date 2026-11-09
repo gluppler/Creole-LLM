@@ -60,8 +60,8 @@
 !/assets/
 !/thesis/
 /thesis/*
-!/thesis/ChewZhanHong_23018039_Proposal.docx
-!/thesis/ChewZhanHong_23018039_Proposal.pdf
+!/thesis/ChewZhanHong_23018039_CP2_Report.docx
+!/thesis/ChewZhanHong_23018039_CP2_Report.pdf
 
 # Never committed, wherever they appear
 .DS_Store

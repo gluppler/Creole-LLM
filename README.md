@@ -263,7 +263,7 @@ npm test
 
 Node 22.18 or later. Start at [CONTRIBUTING.md](CONTRIBUTING.md). The rules files for
 other agents are written from the skill: after editing `skills/creole/SKILL.md`, run
-`node scripts/sync-rules.mjs` (the tests fail while they differ). The project proposal
+`node scripts/sync-rules.mjs` (the tests fail while they differ). The CP2 final report
 is in [thesis/](thesis/).
 
 ## License
