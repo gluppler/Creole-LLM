@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import {
-  addUser, applyUpdate, compactedContext, config, contextUsage, degradedContext, emptyGraph, escapeDelimiters, evaluateTrigger, extractUpdate, loadGraph, loadState, parseGraph, readTail, redactSecrets, reinjectContext,
+  addUser, applyUpdate, compactedContext, config, contextUsage, conversationText, degradedContext, emptyGraph, escapeDelimiters, evaluateTrigger, extractUpdate, loadGraph, loadState, parseGraph, readTail, redactSecrets, reinjectContext,
   renderGraph, replayBudget, sessionDir, triggerLimit,
 } from '../lib/creole-core.mjs';
 import { checkCheckpoint, checkpointContext, config as graphConfig, languageContext, settingsNotice, skillMetadata } from '../lib/creole-graph.mjs';
@@ -37,6 +37,9 @@ const DELTA = `<!-- creole delta v2 · pass 2 · 2026-10-11T12:00:00Z · 131000 
 ~ S1: rate limiting | in progress | remaining: tests
 + B2: \`src/middleware/limit.ts\`: per-IP limiter
 L: Refresh token rotation fixed`;
+
+// The user's words the fixture graph's constraint quotes.
+const SAID = 'Build auth. Express only, no new dependencies';
 
 // Fabricated credentials. Each contains FAKEsecret, so one search finds any leak.
 const SK = 'sk-FAKEsecret0123456789abcdef';
@@ -96,6 +99,22 @@ test('replayBudget: the user\'s messages come back within half the room below th
   }
   assert.equal(replayBudget({ ...cfg, window: 200000, floor: 125000 }), 200000, 'a base past the share was measured late: ignored');
   assert.equal(replayBudget({ ...cfg, window: 0, floor: null }), 200000, 'no window known yet');
+});
+
+test('grounding: a graph states verbatim only what the session holds; a made-up quote, path, code span or error line is refused', () => {
+  const head = '<!-- creole graph v2 · pass 1 · 2026-10-12T01:00:00Z · 70000 tokens -->';
+  const graph = (...rows) => extractUpdate([head, 'T: Fix the retry bug', ...rows, 'L: Tests read'].join('\n'));
+  const users = ['Fix the retry bug. At most  3 attempts, and no new dependencies.'];
+  const source = `${users[0]}\nRead src/http.ts\ntest retry: expected 3 attempts, received 1\nwithRetry wraps fetch`;
+  const ground = { users, source };
+  const errors = (...rows) => applyUpdate(emptyGraph(), graph(...rows), 250, ground).errors;
+  assert.deepEqual(errors('C1: "At most 3 attempts"', 'B1: `withRetry` in src/http.ts', 'I1: retry: "expected 3 attempts, received 1"'), [], 'all in the session (spacing aside)');
+  assert.match(errors('C1: "At most 5 attempts"').join(), /C1: those words are not in the user's messages/, 'a constraint the user never wrote');
+  assert.match(errors('B1: `withBackoff` in src/http.ts').join(), /B1: not in the conversation: "withBackoff"/, 'a made-up identifier');
+  assert.match(errors('B1: retries in src/retry.ts').join(), /B1: not in the conversation: "src\/retry\.ts"/, 'a made-up path');
+  assert.match(errors('I1: retry: "expected 3 attempts, received 0"').join(), /I1: not in the conversation/, 'an error line changed');
+  assert.deepEqual(applyUpdate(emptyGraph(), graph('B1: `anything` in a/b.ts'), 250).errors, [], 'no ground given: unchecked');
+  assert.match(conversationText([{ text: 'hi', toolUses: [{ tool: 'Read', input: { file_path: 'src/http.ts' }, result: 'withRetry' }], toolResults: [{ text: 'received 1' }] }]), /hi[\s\S]*src\/http\.ts[\s\S]*withRetry[\s\S]*received 1/);
 });
 
 test('triggerLimit: the base plus the headroom, capped by the share of the window', () => {
@@ -252,13 +271,16 @@ test('loadGraph ignores a graph.json that was edited out of shape', () => {
 
 // ------------------------------------------------------------------ hooks (Claude Code and Codex)
 
-function session(env = {}) {
+// said: the user's messages the session starts with, so the fixture graph's constraint quotes real words
+// (grounding); [] for a test that checks exactly which messages are kept.
+function session(env = {}, { said = [SAID] } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'creole-'));
   const transcript = join(dir, 'transcript.jsonl');
   const fullEnv = { CLAUDE_PLUGIN_DATA: join(dir, 'data'), ...env };
   const call = (event, extra = {}) => handle({ session_id: 's1', transcript_path: transcript, hook_event_name: event, ...extra }, fullEnv);
   const log = (...entries) => writeFileSync(transcript, jsonl(...entries));
   const stateDir = join(fullEnv.CLAUDE_PLUGIN_DATA || fullEnv.PLUGIN_DATA, 'sessions', 's1');
+  for (const text of said) addUser(stateDir, text);
   return { call, log, stateDir };
 }
 
@@ -523,6 +545,7 @@ test('one handler for every host: Cursor and Gemini CLI events, growth estimated
   const big = 'x'.repeat(16000); // about 4k tokens per payload, so the 40k headroom fills on the 10th
   const fire = (call, event, field) => { for (let i = 0; i < 20; i++) { const r = call(event, { [field]: big }); if (r) return [r, i + 1]; } };
 
+  for (const id of ['c1', 'g1']) addUser(join(dir, 'sessions', id), SAID); // the words the graph's constraint quotes
   const cursor = (event, extra = {}) => handle({ conversation_id: 'c1', hook_event_name: event, ...extra }, { CLAUDE_PLUGIN_DATA: dir, CURSOR_VERSION: '3.20.17', CREOLE_HEADROOM_TOKENS: '40000' });
   assert.equal(cursor('beforeSubmitPrompt', { prompt: 'Build the export' }), null);
   const [first, calls] = fire(cursor, 'postToolUse', 'tool_output');
@@ -543,7 +566,7 @@ test('one handler for every host: Cursor and Gemini CLI events, growth estimated
 });
 
 test('the user\'s prompts come back verbatim beside the graph, and a rejected graph leaves nothing for later triggers', () => {
-  const { call, log } = session();
+  const { call, log } = session({}, { said: [] });
   const cwd = mkdtempSync(join(tmpdir(), 'creole-api-')); // a real directory, for the codebase map
   call('UserPromptSubmit', { prompt: 'Build auth. Express only, no new dependencies', cwd });
   call('UserPromptSubmit', { prompt: `Push with ghp_${'a'.repeat(36)}`, cwd });
@@ -688,7 +711,7 @@ test('hooks: a message Creole cannot keep is reported, and the restore labels wh
   assert.ok(existsSync(join(stateDir, 'gap.json')));
   assert.match(call('PreCompact', { trigger: 'auto' }), /^Creole restores this session graph after compaction, but not all of the user's messages:/);
   const restored = call('SessionStart', { source: 'compact' }).hookSpecificOutput.additionalContext;
-  assert.ok(restored.endsWith(reinjectContext(GRAPH, ['Use pnpm'], Infinity, true)));
+  assert.ok(restored.endsWith(reinjectContext(GRAPH, [SAID, 'Use pnpm'], Infinity, true)));
   assert.match(restored, /Some of the user's messages were not kept/);
   assert.doesNotMatch(restored, /complete and in order|xxxx/);
 });
@@ -739,7 +762,7 @@ test('hooks: SessionEnd marks the session ended and a resume takes the mark off;
   assert.equal(existsSync(join(stateDir, 'ended.json')), false);
   assert.equal(existsSync(join(stateDir, 'gap.json')), false, 'its record is whole');
   for (const env of [{}, { CREOLE_MODULE: '1' }]) {
-    const other = session(env);
+    const other = session(env, { said: [] });
     if (env.CREOLE_MODULE) mkdirSync(other.stateDir, { recursive: true });
     assert.equal(other.call('SessionEnd', { reason: 'other' }), null);
     assert.equal(existsSync(join(other.stateDir, 'ended.json')), false, JSON.stringify(env));
@@ -747,19 +770,20 @@ test('hooks: SessionEnd marks the session ended and a resume takes the mark off;
 });
 
 test('hooks: a resumed session with no record of its messages is labeled incomplete; one with its record is not', () => {
-  const { call } = session();
+  const { call } = session({}, { said: [] });
   call('SessionStart', { source: 'resume' }); // its record expired, or Creole was installed since
+  call('UserPromptSubmit', { prompt: SAID });
   call('UserPromptSubmit', { prompt: 'Add retries' });
   call('Stop', { last_assistant_message: GRAPH });
   assert.match(call('PreCompact', { trigger: 'auto' }), /^Creole restores this session graph after compaction, but not all of the user's messages:/);
-  assert.ok(call('SessionStart', { source: 'compact' }).hookSpecificOutput.additionalContext.endsWith(reinjectContext(GRAPH, ['Add retries'], Infinity, true)));
+  assert.ok(call('SessionStart', { source: 'compact' }).hookSpecificOutput.additionalContext.endsWith(reinjectContext(GRAPH, [SAID, 'Add retries'], Infinity, true)));
 
   const kept = session();
   kept.call('SessionStart', { source: 'startup' });
   kept.call('UserPromptSubmit', { prompt: 'Add retries' });
   kept.call('Stop', { last_assistant_message: GRAPH });
   kept.call('SessionStart', { source: 'resume' });
-  assert.ok(kept.call('SessionStart', { source: 'compact' }).hookSpecificOutput.additionalContext.endsWith(reinjectContext(GRAPH, ['Add retries'], Infinity)));
+  assert.ok(kept.call('SessionStart', { source: 'compact' }).hookSpecificOutput.additionalContext.endsWith(reinjectContext(GRAPH, [SAID, 'Add retries'], Infinity)));
 });
 
 test('hooks: an older version\'s record, a save cut off before or after its rename, then a resume: the last complete record comes back, a newer gap labeled', () => {
@@ -783,7 +807,7 @@ test('hooks: an older version\'s record, a save cut off before or after its rena
   const minuteAgo = Date.now() / 1000 - 60;
   utimesSync(held, minuteAgo, minuteAgo);
   after.call('SessionStart', { source: 'resume' });
-  assert.ok(after.call('SessionStart', { source: 'compact' }).hookSpecificOutput.additionalContext.endsWith(reinjectContext(GRAPH, ['Use pnpm'], Infinity)));
+  assert.ok(after.call('SessionStart', { source: 'compact' }).hookSpecificOutput.additionalContext.endsWith(reinjectContext(GRAPH, [SAID, 'Use pnpm'], Infinity)));
   assert.equal(existsSync(held), false);
 });
 
@@ -832,6 +856,7 @@ test('the Cursor and Gemini CLI templates run the shared hook, from the checkout
     // The reply event saves the graph, so the hook ran from the path the template names.
     const input = JSON.stringify({ session_id: 's', conversation_id: 's', hook_event_name: events[2], text: GRAPH, prompt_response: GRAPH });
     const data = mkdtempSync(join(tmpdir(), 'creole-'));
+    addUser(join(data, 'sessions', 's'), SAID);
     const r = spawnSync('sh', ['-c', [...commands][0].replaceAll('CREOLE_DIR', root)], { input, env: { ...rest, ...env, CLAUDE_PLUGIN_DATA: data } });
     assert.match(r.stdout.toString(), /graph saved \(pass 1\)/, file);
   }

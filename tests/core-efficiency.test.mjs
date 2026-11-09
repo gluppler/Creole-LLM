@@ -173,14 +173,14 @@ test('session store: an interrupted write keeps the last complete record and lab
   assert.equal(core.hasGap(full), true);
 });
 
-test('session store: only a session that ended and was then untouched for 30 days goes, and only one this version can read; age alone removes none', (t) => {
+test('session store: a session untouched for 30 days goes, ended or killed, and only one this version can read; a recent, busy or current one stays', (t) => {
   const base = tempDir(t, 'creole-data-');
   const dirOf = (id) => join(base, 'sessions', id);
   const ids = ['ended', 'live', 'recent', 'damaged', 'badGraph', 'resumed', 'busy', 'current'];
   for (const id of ids) addUser(dirOf(id), `Message for ${id}`);
   writeFileSync(join(dirOf('damaged'), 'users.json'), '["Message for dam');
   writeFileSync(join(dirOf('badGraph'), 'graph.json'), '{"v":9}');
-  for (const id of ids.filter((id) => id !== 'live')) core.endSession(dirOf(id)); // live: still running, or killed
+  for (const id of ids.filter((id) => id !== 'live')) core.endSession(dirOf(id)); // live: never ended (killed)
   core.resumeSession(dirOf('resumed'));
   mkdirSync(join(dirOf('busy'), 'users.lock')); // a hook of that session is running
   for (const id of ids) {
@@ -188,11 +188,11 @@ test('session store: only a session that ended and was then untouched for 30 day
     for (const f of readdirSync(dirOf(id))) if (f !== 'users.lock') utimesSync(join(dirOf(id), f), when, when);
   }
   addUser(dirOf('current'), 'Add retries');
-  assert.equal(existsSync(dirOf('ended')), false, 'ended 31 days ago: removed');
-  for (const id of ['live', 'recent', 'damaged', 'badGraph', 'resumed', 'busy']) assert.ok(existsSync(join(dirOf(id), 'users.json')), `${id}: kept`);
+  for (const id of ['ended', 'live', 'resumed']) assert.equal(existsSync(dirOf(id)), false, `${id}: 31 days quiet, removed`);
+  for (const id of ['recent', 'damaged', 'badGraph', 'busy']) assert.ok(existsSync(join(dirOf(id), 'users.json')), `${id}: kept`);
   assert.equal(readFileSync(join(dirOf('damaged'), 'users.json'), 'utf8'), '["Message for dam');
   assert.deepEqual(loadUsers(dirOf('current')), ['Message for current', 'Add retries'], 'the current session is never expired');
-  assert.equal(core.hasGap(dirOf('current')) || core.hasGap(dirOf('resumed')), false);
+  assert.equal(core.hasGap(dirOf('current')), false);
   core.endSession(dirOf('never')); // a session with no record gets no marker
   assert.equal(existsSync(dirOf('never')), false);
 });

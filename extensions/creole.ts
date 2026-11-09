@@ -114,7 +114,12 @@ export default function creole(pi: ExtensionAPI) {
     reinjectContext(
       renderGraph(state.graph),
       state.users,
-      replayBudget({ window: state.window || cfg.window, threshold: cfg.threshold, floor: state.floor, headroom: cfg.headroom }),
+      replayBudget({
+        window: state.window || cfg.window,
+        threshold: cfg.threshold,
+        floor: state.floor,
+        headroom: cfg.headroom,
+      }),
       state.gap,
     );
 
@@ -216,7 +221,8 @@ export default function creole(pi: ExtensionAPI) {
     const update = extractUpdate(lastAssistantText(messages));
     if (!update && !state.pending) return;
 
-    const { graph, errors, tooLong } = applyUpdate(state.graph, update, cfg.maxWords);
+    // A constraint must quote the user's kept words (applyUpdate's grounding).
+    const { graph, errors, tooLong } = applyUpdate(state.graph, update, cfg.maxWords, { users: state.users });
     // Only enforce an update Creole asked for, and retry once, so a failing model never loops.
     // On the retry, an update whose only problem is length is kept anyway: long beats lost.
     const retryUsed = state.retried || !state.pending;

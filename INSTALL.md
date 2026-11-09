@@ -15,7 +15,7 @@ Each section names its tier.
 
 ## Claude Code
 
-**Tier: live-verified** on Claude Code 2.1.292 (the function hooks).
+**Tier: live-verified** on Claude Code 2.1.309 (the function hooks).
 
 ```sh
 claude plugin marketplace add gluppler/Creole-LLM
@@ -201,6 +201,27 @@ get Creole's rules from this repository's [`AGENTS.md`](AGENTS.md): copy it into
 project root. Agents that read skills: copy `skills/creole/` into their skills
 folder. Uninstall: delete the copied file or folder.
 
+## Update to a new release
+
+Releases are tagged on GitHub (`v1.0.3` and later) and published to npm as
+`creole-llm`. `claude plugin list` (or your agent's list command) shows the
+version you have. Start a new session after updating: a running session keeps the
+rules it started with.
+
+| Agent | Update |
+|---|---|
+| Claude Code | `claude plugin marketplace update creole-llm`, then `claude plugin update creole@creole-llm`, then restart Claude Code |
+| Codex | `git -C /path/to/Creole-LLM pull`, then `codex plugin remove creole@creole-llm` and `codex plugin add creole@creole-llm` |
+| omp, pi | `git -C /path/to/Creole-LLM pull`; omp also has `omp plugin upgrade` |
+| OpenCode | `npm update creole-llm`, or pin `"creole-llm@1.0.3"` in `opencode.json`; a clone: `git pull` |
+| npm | `npm install creole-llm@latest` |
+| Skills CLI | `npx skills update creole` (same `--agent` and `--global` flags as the install) |
+| Copilot CLI, Devin CLI, Grok Build, Cursor and Qoder plugins | uninstall and install again with the commands above; the host's own update command works too where it has one |
+| Rules-file agents (Cursor, Windsurf, Cline, Kiro, Qoder, Copilot, Gemini CLI, Qwen Code, Kimi, `AGENTS.md`) | `git pull` the clone, then copy the file again over the old one |
+
+Updating leaves session records in place; one this version cannot read is neither
+restored nor overwritten, and goes after 30 days untouched.
+
 ## Data left behind
 
 | Data | Where | Removed by uninstall |
@@ -211,6 +232,6 @@ folder. Uninstall: delete the copied file or folder.
 | Memory-file backups from `/creole compress` | `backups/` under the agent shell's `CLAUDE_PLUGIN_DATA`, then `PLUGIN_DATA`, else `~/.creole` (the script prints the path) | No; Creole never removes them |
 | Host transcripts and provider logs | The host's and the provider's own stores | No; outside Creole |
 
-A session's record is removed at a later session start once the host has ended
-that session and 30 days have passed untouched. Credential redaction is
+A session's record is removed at a later session start once it has gone 30 days
+untouched, whether the session ended normally or was killed. Credential redaction is
 pattern-based and does not remove other personal data.

@@ -14,7 +14,6 @@ import { spyFs } from './spy-fs.mjs';
 
 const GRAPH = `<!-- creole graph v2 · pass 1 · 2026-10-11T10:00:00Z · 130000 tokens -->
 T: Port the CLI to Rust
-C1: "no async runtime"
 B1: \`src/args.rs\`: clap parser
 S1: config loading | in progress | remaining: env overrides
 L: Argument parser done`;
@@ -149,10 +148,11 @@ test('omp: the user\'s prompts and the graph form the summary; a rejected graph 
   handlers.before_agent_start({ prompt: 'Port the CLI to Rust, no async runtime' }, ctx);
   usage.value = { tokens: 130000, contextWindow: 200000, percent: 65 };
   assert.match(handlers.before_agent_start({ prompt: 'Then add config loading' }, ctx).message.content, /the full creole graph/);
-  reply(GRAPH.replace('C1: "', 'C1: '));
-  assert.match(sent.at(-1)[0].content, /C1: a constraint/);
-  reply(GRAPH);
-  assert.equal(compact('e1').compaction.summary, reinjectContext(GRAPH, ['Port the CLI to Rust, no async runtime', 'Then add config loading']));
+  const withC = GRAPH.replace('T: Port the CLI to Rust\n', 'T: Port the CLI to Rust\nC1: "no async runtime"\n');
+  reply(withC.replace('no async runtime', 'no threads at all'));
+  assert.match(sent.at(-1)[0].content, /C1: those words are not in the user's messages/, 'a constraint the user never wrote');
+  reply(withC);
+  assert.equal(compact('e1').compaction.summary, reinjectContext(withC, ['Port the CLI to Rust, no async runtime', 'Then add config loading']));
 
   usage.value = { tokens: 40000, contextWindow: 200000, percent: 20 };
   handlers.before_agent_start({ prompt: '' }, ctx);
@@ -452,7 +452,7 @@ test('omp: the first turn, and the first after each compaction that kept no copy
   handlers.session_compact({ compactionEntry: { summary: 'Native summary' } }, ctx);
   const kept = handlers.before_agent_start({ prompt: 'more' }, ctx);
   assert.equal(blocks(kept), 0);
-  assert.match(kept.message.content, /this record restores its task[^]*\nC1: "no async runtime"/);
+  assert.match(kept.message.content, /this record restores its task[^]*\nB1: `src\/args\.rs`: clap parser/);
   // A resumed branch: the block comes again only when its context lacks one.
   handlers.session_start({}, ctx);
   assert.equal(blocks(handlers.before_agent_start({ prompt: 'resumed' }, ctx)), 0);

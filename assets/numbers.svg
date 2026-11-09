@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" role="img" aria-label="Mean cost per session for Creole, no plugin and each compared plugin, by model and effort. The tables below hold the same numbers.">
+<style>text{font:12px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#212529}.t{font-size:14px;font-weight:600}.s{fill:#495057}.h{font-size:15px;font-weight:600}</style>
+<rect width="960" height="640" rx="8" fill="#fff"/>
+<text x="46" y="28" class="h">Mean cost per session, in dollars (each panel has its own scale)</text>
+<rect x="46" y="42" width="12" height="12" fill="#d9480f"/><text x="63" y="52">Creole</text>
+<rect x="122" y="42" width="12" height="12" fill="#868e96"/><text x="139" y="52">native</text>
+<rect x="198" y="42" width="12" height="12" fill="#1971c2"/><text x="215" y="52">Ponytail</text>
+<rect x="288" y="42" width="12" height="12" fill="#2f9e44"/><text x="305" y="52">i-have-adhd</text>
+<rect x="399" y="42" width="12" height="12" fill="#9c36b5"/><text x="416" y="52">Caveman</text>
+<rect x="482" y="42" width="12" height="12" fill="#0c8599"/><text x="499" y="52">llm-wiki</text>
+<text x="46" y="84" class="t">Haiku 4.5, bug fixes</text>
+<line x1="46" x2="314" y1="296.0" y2="296.0" stroke="#dee2e6"/><text x="40" y="300.0" text-anchor="end" class="s">0.0</text>
+<line x1="46" x2="314" y1="256.0" y2="256.0" stroke="#dee2e6"/><text x="40" y="260.0" text-anchor="end" class="s">0.1</text>
+<line x1="46" x2="314" y1="216.0" y2="216.0" stroke="#dee2e6"/><text x="40" y="220.0" text-anchor="end" class="s">0.2</text>
+<line x1="46" x2="314" y1="176.0" y2="176.0" stroke="#dee2e6"/><text x="40" y="180.0" text-anchor="end" class="s">0.3</text>
+<line x1="46" x2="314" y1="136.0" y2="136.0" stroke="#dee2e6"/><text x="40" y="140.0" text-anchor="end" class="s">0.4</text>
+<line x1="46" x2="314" y1="96.0" y2="96.0" stroke="#dee2e6"/><text x="40" y="100.0" text-anchor="end" class="s">0.5</text>
+<rect x="55.7" y="204.8" width="13.0" height="91.2" fill="#d9480f"><title>Creole: $0.228</title></rect>
+<rect x="69.7" y="151.3" width="13.0" height="144.7" fill="#868e96"><title>native: $0.362</title></rect>
+<rect x="83.7" y="162.3" width="13.0" height="133.7" fill="#1971c2"><title>Ponytail: $0.334</title></rect>
+<rect x="97.7" y="190.7" width="13.0" height="105.3" fill="#2f9e44"><title>i-have-adhd: $0.263</title></rect>
+<rect x="111.7" y="196.2" width="13.0" height="99.8" fill="#9c36b5"><title>Caveman: $0.250</title></rect>
+<text x="90.7" y="312" text-anchor="middle" class="s">lowest</text>
+<rect x="145.0" y="190.4" width="13.0" height="105.6" fill="#d9480f"><title>Creole: $0.264</title></rect>
+<rect x="159.0" y="176.8" width="13.0" height="119.2" fill="#868e96"><title>native: $0.298</title></rect>
+<rect x="173.0" y="129.2" width="13.0" height="166.8" fill="#1971c2"><title>Ponytail: $0.417</title></rect>
+<rect x="187.0" y="182.8" width="13.0" height="113.2" fill="#2f9e44"><title>i-have-adhd: $0.283</title></rect>
+<rect x="201.0" y="176.2" width="13.0" height="119.8" fill="#9c36b5"><title>Caveman: $0.299</title></rect>
+<text x="180.0" y="312" text-anchor="middle" class="s">default</text>
+<rect x="234.3" y="198.7" width="13.0" height="97.3" fill="#d9480f"><title>Creole: $0.243</title></rect>
+<rect x="248.3" y="146.2" width="13.0" height="149.8" fill="#868e96"><title>native: $0.374</title></rect>
+<rect x="262.3" y="181.4" width="13.0" height="114.6" fill="#1971c2"><title>Ponytail: $0.286</title></rect>
+<rect x="276.3" y="150.9" width="13.0" height="145.1" fill="#2f9e44"><title>i-have-adhd: $0.363</title></rect>
+<rect x="290.3" y="180.7" width="13.0" height="115.3" fill="#9c36b5"><title>Caveman: $0.288</title></rect>
+<text x="269.3" y="312" text-anchor="middle" class="s">max</text>
+<text x="360" y="84" class="t">Sonnet 5.5, bug fixes</text>
+<line x1="360" x2="628" y1="296.0" y2="296.0" stroke="#dee2e6"/><text x="354" y="300.0" text-anchor="end" class="s">0.0</text>
+<line x1="360" x2="628" y1="256.0" y2="256.0" stroke="#dee2e6"/><text x="354" y="260.0" text-anchor="end" class="s">0.2</text>
+<line x1="360" x2="628" y1="216.0" y2="216.0" stroke="#dee2e6"/><text x="354" y="220.0" text-anchor="end" class="s">0.4</text>
+<line x1="360" x2="628" y1="176.0" y2="176.0" stroke="#dee2e6"/><text x="354" y="180.0" text-anchor="end" class="s">0.6</text>
+<line x1="360" x2="628" y1="136.0" y2="136.0" stroke="#dee2e6"/><text x="354" y="140.0" text-anchor="end" class="s">0.8</text>
+<line x1="360" x2="628" y1="96.0" y2="96.0" stroke="#dee2e6"/><text x="354" y="100.0" text-anchor="end" class="s">1.0</text>
+<rect x="369.7" y="245.8" width="13.0" height="50.2" fill="#d9480f"><title>Creole: $0.251</title></rect>
+<rect x="383.7" y="237.0" width="13.0" height="59.0" fill="#868e96"><title>native: $0.295</title></rect>
+<rect x="397.7" y="235.7" width="13.0" height="60.3" fill="#1971c2"><title>Ponytail: $0.301</title></rect>
+<rect x="411.7" y="229.9" width="13.0" height="66.1" fill="#2f9e44"><title>i-have-adhd: $0.330</title></rect>
+<rect x="425.7" y="233.4" width="13.0" height="62.6" fill="#9c36b5"><title>Caveman: $0.313</title></rect>
+<text x="404.7" y="312" text-anchor="middle" class="s">lowest</text>
+<rect x="459.0" y="248.5" width="13.0" height="47.5" fill="#d9480f"><title>Creole: $0.237</title></rect>
+<rect x="473.0" y="235.3" width="13.0" height="60.7" fill="#868e96"><title>native: $0.303</title></rect>
+<rect x="487.0" y="233.2" width="13.0" height="62.8" fill="#1971c2"><title>Ponytail: $0.314</title></rect>
+<rect x="501.0" y="228.4" width="13.0" height="67.6" fill="#2f9e44"><title>i-have-adhd: $0.338</title></rect>
+<rect x="515.0" y="229.5" width="13.0" height="66.5" fill="#9c36b5"><title>Caveman: $0.333</title></rect>
+<text x="494.0" y="312" text-anchor="middle" class="s">default</text>
+<rect x="548.3" y="217.5" width="13.0" height="78.5" fill="#d9480f"><title>Creole: $0.392</title></rect>
+<rect x="562.3" y="121.8" width="13.0" height="174.2" fill="#868e96"><title>native: $0.871</title></rect>
+<rect x="576.3" y="181.2" width="13.0" height="114.8" fill="#1971c2"><title>Ponytail: $0.574</title></rect>
+<rect x="590.3" y="170.6" width="13.0" height="125.4" fill="#2f9e44"><title>i-have-adhd: $0.627</title></rect>
+<rect x="604.3" y="191.1" width="13.0" height="104.9" fill="#9c36b5"><title>Caveman: $0.524</title></rect>
+<text x="583.3" y="312" text-anchor="middle" class="s">max</text>
+<text x="674" y="84" class="t">Opus 5.5, bug fixes</text>
+<line x1="674" x2="942" y1="296.0" y2="296.0" stroke="#dee2e6"/><text x="668" y="300.0" text-anchor="end" class="s">0.0</text>
+<line x1="674" x2="942" y1="229.3" y2="229.3" stroke="#dee2e6"/><text x="668" y="233.3" text-anchor="end" class="s">0.5</text>
+<line x1="674" x2="942" y1="162.7" y2="162.7" stroke="#dee2e6"/><text x="668" y="166.7" text-anchor="end" class="s">1.0</text>
+<line x1="674" x2="942" y1="96.0" y2="96.0" stroke="#dee2e6"/><text x="668" y="100.0" text-anchor="end" class="s">1.5</text>
+<rect x="683.7" y="224.1" width="13.0" height="71.9" fill="#d9480f"><title>Creole: $0.539</title></rect>
+<rect x="697.7" y="212.2" width="13.0" height="83.8" fill="#868e96"><title>native: $0.628</title></rect>
+<rect x="711.7" y="217.3" width="13.0" height="78.7" fill="#1971c2"><title>Ponytail: $0.590</title></rect>
+<rect x="725.7" y="203.9" width="13.0" height="92.1" fill="#2f9e44"><title>i-have-adhd: $0.690</title></rect>
+<rect x="739.7" y="206.0" width="13.0" height="90.0" fill="#9c36b5"><title>Caveman: $0.675</title></rect>
+<text x="718.7" y="312" text-anchor="middle" class="s">lowest</text>
+<rect x="773.0" y="229.5" width="13.0" height="66.5" fill="#d9480f"><title>Creole: $0.498</title></rect>
+<rect x="787.0" y="219.9" width="13.0" height="76.1" fill="#868e96"><title>native: $0.571</title></rect>
+<rect x="801.0" y="215.1" width="13.0" height="80.9" fill="#1971c2"><title>Ponytail: $0.607</title></rect>
+<rect x="815.0" y="201.8" width="13.0" height="94.2" fill="#2f9e44"><title>i-have-adhd: $0.706</title></rect>
+<rect x="829.0" y="217.8" width="13.0" height="78.2" fill="#9c36b5"><title>Caveman: $0.586</title></rect>
+<text x="808.0" y="312" text-anchor="middle" class="s">default</text>
+<rect x="862.3" y="202.0" width="13.0" height="94.0" fill="#d9480f"><title>Creole: $0.705</title></rect>
+<rect x="876.3" y="151.3" width="13.0" height="144.7" fill="#868e96"><title>native: $1.085</title></rect>
+<rect x="890.3" y="158.1" width="13.0" height="137.9" fill="#1971c2"><title>Ponytail: $1.034</title></rect>
+<rect x="904.3" y="101.8" width="13.0" height="194.2" fill="#2f9e44"><title>i-have-adhd: $1.457</title></rect>
+<rect x="918.3" y="173.6" width="13.0" height="122.4" fill="#9c36b5"><title>Caveman: $0.918</title></rect>
+<text x="897.3" y="312" text-anchor="middle" class="s">max</text>
+<text x="46" y="354" class="t">Haiku 4.5, with subagents</text>
+<line x1="46" x2="314" y1="566.0" y2="566.0" stroke="#dee2e6"/><text x="40" y="570.0" text-anchor="end" class="s">0.0</text>
+<line x1="46" x2="314" y1="499.3" y2="499.3" stroke="#dee2e6"/><text x="40" y="503.3" text-anchor="end" class="s">0.5</text>
+<line x1="46" x2="314" y1="432.7" y2="432.7" stroke="#dee2e6"/><text x="40" y="436.7" text-anchor="end" class="s">1.0</text>
+<line x1="46" x2="314" y1="366.0" y2="366.0" stroke="#dee2e6"/><text x="40" y="370.0" text-anchor="end" class="s">1.5</text>
+<rect x="69.7" y="484.0" width="13.0" height="82.0" fill="#d9480f"><title>Creole: $0.615</title></rect>
+<rect x="83.7" y="467.6" width="13.0" height="98.4" fill="#868e96"><title>native: $0.738</title></rect>
+<rect x="97.7" y="429.8" width="13.0" height="136.2" fill="#0c8599"><title>llm-wiki: $1.021</title></rect>
+<text x="90.7" y="582" text-anchor="middle" class="s">lowest</text>
+<rect x="159.0" y="497.5" width="13.0" height="68.5" fill="#d9480f"><title>Creole: $0.513</title></rect>
+<rect x="173.0" y="464.2" width="13.0" height="101.8" fill="#868e96"><title>native: $0.764</title></rect>
+<rect x="187.0" y="445.8" width="13.0" height="120.2" fill="#0c8599"><title>llm-wiki: $0.902</title></rect>
+<text x="180.0" y="582" text-anchor="middle" class="s">default</text>
+<rect x="248.3" y="493.4" width="13.0" height="72.6" fill="#d9480f"><title>Creole: $0.544</title></rect>
+<rect x="262.3" y="448.1" width="13.0" height="117.9" fill="#868e96"><title>native: $0.884</title></rect>
+<rect x="276.3" y="447.0" width="13.0" height="119.0" fill="#0c8599"><title>llm-wiki: $0.892</title></rect>
+<text x="269.3" y="582" text-anchor="middle" class="s">max</text>
+<text x="360" y="354" class="t">Sonnet 5.5, with subagents</text>
+<line x1="360" x2="628" y1="566.0" y2="566.0" stroke="#dee2e6"/><text x="354" y="570.0" text-anchor="end" class="s">0.0</text>
+<line x1="360" x2="628" y1="499.3" y2="499.3" stroke="#dee2e6"/><text x="354" y="503.3" text-anchor="end" class="s">1.0</text>
+<line x1="360" x2="628" y1="432.7" y2="432.7" stroke="#dee2e6"/><text x="354" y="436.7" text-anchor="end" class="s">2.0</text>
+<line x1="360" x2="628" y1="366.0" y2="366.0" stroke="#dee2e6"/><text x="354" y="370.0" text-anchor="end" class="s">3.0</text>
+<rect x="383.7" y="529.9" width="13.0" height="36.1" fill="#d9480f"><title>Creole: $0.541</title></rect>
+<rect x="397.7" y="513.7" width="13.0" height="52.3" fill="#868e96"><title>native: $0.785</title></rect>
+<rect x="411.7" y="509.4" width="13.0" height="56.6" fill="#0c8599"><title>llm-wiki: $0.849</title></rect>
+<text x="404.7" y="582" text-anchor="middle" class="s">lowest</text>
+<rect x="473.0" y="535.6" width="13.0" height="30.4" fill="#d9480f"><title>Creole: $0.456</title></rect>
+<rect x="487.0" y="513.0" width="13.0" height="53.0" fill="#868e96"><title>native: $0.795</title></rect>
+<rect x="501.0" y="503.3" width="13.0" height="62.7" fill="#0c8599"><title>llm-wiki: $0.940</title></rect>
+<text x="494.0" y="582" text-anchor="middle" class="s">default</text>
+<rect x="562.3" y="475.9" width="13.0" height="90.1" fill="#d9480f"><title>Creole: $1.352</title></rect>
+<rect x="576.3" y="422.5" width="13.0" height="143.5" fill="#868e96"><title>native: $2.152</title></rect>
+<rect x="590.3" y="418.9" width="13.0" height="147.1" fill="#0c8599"><title>llm-wiki: $2.207</title></rect>
+<text x="583.3" y="582" text-anchor="middle" class="s">max</text>
+<text x="674" y="354" class="t">Opus 5.5, with subagents</text>
+<line x1="674" x2="942" y1="566.0" y2="566.0" stroke="#dee2e6"/><text x="668" y="570.0" text-anchor="end" class="s">0.0</text>
+<line x1="674" x2="942" y1="526.0" y2="526.0" stroke="#dee2e6"/><text x="668" y="530.0" text-anchor="end" class="s">1.0</text>
+<line x1="674" x2="942" y1="486.0" y2="486.0" stroke="#dee2e6"/><text x="668" y="490.0" text-anchor="end" class="s">2.0</text>
+<line x1="674" x2="942" y1="446.0" y2="446.0" stroke="#dee2e6"/><text x="668" y="450.0" text-anchor="end" class="s">3.0</text>
+<line x1="674" x2="942" y1="406.0" y2="406.0" stroke="#dee2e6"/><text x="668" y="410.0" text-anchor="end" class="s">4.0</text>
+<line x1="674" x2="942" y1="366.0" y2="366.0" stroke="#dee2e6"/><text x="668" y="370.0" text-anchor="end" class="s">5.0</text>
+<rect x="697.7" y="519.0" width="13.0" height="47.0" fill="#d9480f"><title>Creole: $1.174</title></rect>
+<rect x="711.7" y="498.6" width="13.0" height="67.4" fill="#868e96"><title>native: $1.685</title></rect>
+<rect x="725.7" y="493.2" width="13.0" height="72.8" fill="#0c8599"><title>llm-wiki: $1.821</title></rect>
+<text x="718.7" y="582" text-anchor="middle" class="s">lowest</text>
+<rect x="787.0" y="518.0" width="13.0" height="48.0" fill="#d9480f"><title>Creole: $1.200</title></rect>
+<rect x="801.0" y="501.9" width="13.0" height="64.1" fill="#868e96"><title>native: $1.602</title></rect>
+<rect x="815.0" y="489.5" width="13.0" height="76.5" fill="#0c8599"><title>llm-wiki: $1.913</title></rect>
+<text x="808.0" y="582" text-anchor="middle" class="s">default</text>
+<rect x="876.3" y="473.8" width="13.0" height="92.2" fill="#d9480f"><title>Creole: $2.306</title></rect>
+<rect x="890.3" y="415.6" width="13.0" height="150.4" fill="#868e96"><title>native: $3.759</title></rect>
+<rect x="904.3" y="388.2" width="13.0" height="177.8" fill="#0c8599"><title>llm-wiki: $4.444</title></rect>
+<text x="897.3" y="582" text-anchor="middle" class="s">max</text>
+</svg>

@@ -1,9 +1,10 @@
 {
   "name": "creole",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Training-free context compaction for coding agents: Creole, a compact working language for notes, plans and replies, plus compaction of long sessions into a small session graph of the task, the user's constraints and the current work.",
   "author": {
-    "name": "Chew Zhan Hong"
+    "name": "Chew Zhan Hong",
+    "url": "https://github.com/gluppler"
   },
   "license": "MIT",
   "keywords": [
@@ -15,5 +16,21 @@
   "skills": "./skills/",
   "hooks": "./hooks/codex-hooks.json",
   "homepage": "https://github.com/gluppler/Creole-LLM",
-  "repository": "https://github.com/gluppler/Creole-LLM"
+  "repository": "https://github.com/gluppler/Creole-LLM",
+  "interface": {
+    "displayName": "Creole",
+    "shortDescription": "Fewer tokens, same work: a compact working language and compaction that keeps the task",
+    "longDescription": "A compact working language for notes, plans and replies, plus compaction of long sessions into a small session graph of the task, the user's constraints and the current work, shared with subagents.",
+    "developerName": "Chew Zhan Hong",
+    "category": "Productivity",
+    "capabilities": [
+      "Instructions",
+      "Lifecycle hooks"
+    ],
+    "websiteURL": "https://github.com/gluppler/Creole-LLM",
+    "defaultPrompt": [
+      "Use Creole for this session.",
+      "Compress CLAUDE.md with /creole compress."
+    ]
+  }
 }

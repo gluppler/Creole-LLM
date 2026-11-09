@@ -7,6 +7,7 @@
 //                     and not instructions
 //   prompt.attachment drop the copies the SessionStart command hook adds before the module is running
 //   prompt.submit     keep each of the user's messages in the plugin's store, redacted
+//   tool.check        refuse an edit to a file the user's own words hold still (heldBy), quoting them
 //   session.measure   track the base context; move the engine's auto-compaction (which also runs
 //                     mid-turn) to Creole's limit, unless the user configured auto-compaction
 //   agent.spawn       give a subagent the session graph, once there is one, with the skill's Subagents section
@@ -43,10 +44,12 @@ import {
   checkGraph,
   checkpointContext,
   config,
+  conversationText,
   emptyGraph,
   escapeDelimiters,
   extractUpdate,
   graphSkill,
+  heldBy,
   IDLE_MS,
   languageContext,
   MAP_CHARS,
@@ -210,9 +213,9 @@ const went = (s, sid, r) => !Object.keys(r).length && s.sizes.has(`user:${sid}`)
 // in-session /resume, Creole loaded mid-session), asked of a record that is empty or unverified. Asked
 // before a prompt enters, so a new session counts 0. null until the host binds the session (session
 // start, a prompt given on the command line): turns() then answers 0, even for a resumed conversation.
-// shortcut: turns() may count user-role messages that are not the user's (unconfirmed which), so a verified record is
-// not asked again; 06 should check how often an unverified one is flagged falsely.
-async function missing($, r) {
+// turns() counts every user turn, notifications and scheduled prompts too, which Creole does not keep: the
+// prompts this process saw and left out (s.unkept) are not missing.
+async function missing($, s, sid, r) {
   if (Object.keys(r).length && !r.unverified) return false;
   if (
     !(await $.session.messages().then(
@@ -221,7 +224,7 @@ async function missing($, r) {
     ))
   )
     return null;
-  return (await $.session.turns()) > (r.texts?.length ?? 0);
+  return (await $.session.turns()) - (s.unkept.get(sid) ?? 0) > (r.texts?.length ?? 0);
 }
 
 // Changes the session's record, one change at a time: handlers overlap, and each would otherwise
@@ -269,7 +272,7 @@ async function remember($, s, text) {
     s,
     sid,
     async (r) => {
-      const lost = await missing($, r).catch(() => null);
+      const lost = await missing($, s, sid, r).catch(() => null);
       if (lost) s.gaps.add(sid);
       return { texts: [...textsOf(r), redactSecrets(text)], unverified: lost === null || undefined };
     },
@@ -291,10 +294,12 @@ function declined(record, s, sid, budget) {
   return checkpointContext(s.cfg.checkpoint, '', textsOf(record), budget) ? null : { reason: 'overflow' };
 }
 
-// Session start: removes other sessions' records that ended and were then untouched for 30 days, if
-// this version can read them, and notes the size of the rest; no record goes to make room. Age alone
-// proves nothing: a session that never ended may still run, or was killed. This session's end mark
-// comes off (a resume), so no other session's cleanup takes it.
+// Session start: removes other sessions' records untouched for 30 days, if this version can read them,
+// and notes the size of the rest; no record goes to make room. A session killed before its end (a crash, a
+// closed terminal) never marks its record ended, so age alone decides: kept forever, such records would fill
+// the 3 MiB every session shares and refuse every new message. A record changes with each message, so 30
+// quiet days mean no live session; one resumed later finds no record and is restored as incomplete.
+// This session's end mark comes off (a resume).
 // shortcut: one whole-store read per record (the host reads its file for every call), and other sessions' growth after
 // this start goes uncounted; keep a ledger of times and sizes if starts slow.
 async function sweep($, s, sid) {
@@ -302,7 +307,7 @@ async function sweep($, s, sid) {
   for (const k of await $.store.keys()) {
     if (!k.startsWith('user:')) continue;
     const r = await $.store.get(k);
-    if (k !== `user:${sid}` && usable(r) && r.ended && now - r.time > IDLE_MS) await $.store.delete(k);
+    if (k !== `user:${sid}` && usable(r) && now - r.time > IDLE_MS) await $.store.delete(k);
     else s.sizes.set(k, sizeOf(k, r));
     if (k === `user:${sid}` && r?.ended) await changeRecord($, s, sid, () => ({}));
   }
@@ -386,10 +391,20 @@ async function compact($, s, e, next) {
   const sid = await $.session.id(); // the compacted session, though a /clear may follow during the fork
   s.skill ??= graphSkill(await $.fs.read(`${$.plugin.root}/skills/creole/SKILL.md`).catch(() => '')) || null;
   const record = await sessionRecord($, sid).catch(() => null);
-  // A record that went while the session ran, or user turns Creole never kept or cannot count yet.
-  if (record && (went(s, sid, record) || ((await missing($, record).catch(() => null)) ?? true))) s.gaps.add(sid);
+  // A record that went while the session ran, or user turns Creole never kept: the session is incomplete.
+  // Turns it cannot count right now decline this compaction only, and are asked again at the next.
+  const lost = record && !went(s, sid, record) ? await missing($, s, sid, record).catch(() => null) : null;
+  if (record && (went(s, sid, record) || lost)) s.gaps.add(sid);
+  const unsure = record && lost === null && !s.gaps.has(sid);
   // The graph Creole stored for the session, its subagents' merges included: the delta builds on it.
   const base = checkGraph(record?.graph) ?? emptyGraph();
+  // What the graph may state verbatim: the user's own words for constraints; for names, paths and errors,
+  // the conversation compacted, the stored graph and those words (applyUpdate's grounding).
+  const users = record ? textsOf(record) : null;
+  const ground = {
+    users,
+    source: [conversationText(e.messages), renderGraph(base), ...(users ?? [])].join('\n'),
+  };
   const { context } = await $.session.usage();
   const model = await $.session.model().catch(() => null);
   const stale = async () =>
@@ -418,10 +433,19 @@ async function compact($, s, e, next) {
   });
   const spent = { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
   // Half the room below Creole's limit (replayBudget), so the replacement lands well under it.
-  const budget = replayBudget({ window: s.window || s.cfg.window, threshold: s.cfg.threshold, floor: s.floor, headroom: s.headroom });
+  const budget = replayBudget({
+    window: s.window || s.cfg.window,
+    threshold: s.cfg.threshold,
+    floor: s.floor,
+    headroom: s.headroom,
+  });
   // A record that cannot replace the conversation (unreadable, missing a message, or too long to
   // leave room for any graph), or no skill to write the graph from, means no fork is paid for.
-  let why = s.skill ? declined(record, s, sid, budget) : { reason: 'skill-unavailable' };
+  let why = !s.skill
+    ? { reason: 'skill-unavailable' }
+    : unsure
+      ? { reason: 'uncounted' }
+      : declined(record, s, sid, budget);
   let kept = null; // a valid graph the replacement had no room for
   if (!why)
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -458,7 +482,9 @@ async function compact($, s, e, next) {
         text: written,
         errors,
         tooLong,
-      } = graphed ? applyUpdate(base, update, s.cfg.maxWords) : checkCheckpoint(checkpoint, reply.text, s.cfg.maxWords);
+      } = graphed
+        ? applyUpdate(base, update, s.cfg.maxWords, ground)
+        : checkCheckpoint(checkpoint, reply.text, s.cfg.maxWords);
       // On the retry, a graph whose only problem is length is kept: long beats lost.
       if (!errors.length || (tooLong && attempt === 1)) {
         if (await stale()) return dropped();
@@ -534,6 +560,7 @@ async function compact($, s, e, next) {
       unavailable: "read the user's messages it stored",
       'fork-overflow': "fit the newest messages in the fork's context",
       'skill-unavailable': 'read its skill',
+      uncounted: "confirm it kept every one of the user's messages this time (it asks again at the next compaction)",
     }[why.reason] ?? (graphed ? 'write the session graph' : `write its ${checkpoint} checkpoint`);
   $.ui.log(
     `Creole could not ${failed} (${why.reason}${why.status ? ` ${why.status}` : ''}), so Claude Code compacts instead.`,
@@ -562,6 +589,15 @@ async function disarm($, s) {
   await retarget($, s);
 }
 
+// An error a gating hook caught, so the host's step went on without Creole's part: debug log only.
+function hookError($, err) {
+  $.ui.log(`creole-hook-error ${JSON.stringify({ why: redactSecrets(String(err?.message ?? err)).slice(0, 200) })}`, {
+    to: 'debug',
+  });
+}
+
+const EDIT_TOOLS = new Set(['Edit', 'Write', 'MultiEdit', 'NotebookEdit']);
+
 export const register = (on, options = {}) => {
   const s = {
     cfg: config({}),
@@ -579,6 +615,7 @@ export const register = (on, options = {}) => {
     shared: new Set(), // the subagents given the session graph, whose answers merge
     queue: Promise.resolve(), // the record changes in flight, in order
     gaps: new Set(), // sessions with a message Creole could not keep
+    unkept: new Map(), // per session, the user turns Creole saw and left out on purpose (not the user's typed words)
     sizes: new Map(), // each session record's bytes, as of session start or this module's last write
     armed: true, // whether Creole compacts at its limit: not from a compaction until usage is seen below it
     reported: false, // whether a compaction that left the conversation above the limit was reported
@@ -694,19 +731,49 @@ export const register = (on, options = {}) => {
 
   // Stored before the prompt enters: a compaction at the start of its turn must already find it.
   // A prompt is new input: a compaction in flight no longer covers the conversation.
+  // A gating hook fails open: an error in Creole's part never stops the user's prompt.
   on('prompt.submit', async ($, e, next) => {
-    s.rev++;
-    if (HUMAN.has(e.origin?.kind) && e.text.trim()) await remember($, s, e.text).catch(() => {});
+    try {
+      s.rev++;
+      if (HUMAN.has(e.origin?.kind) && typeof e.text === 'string' && e.text.trim()) await remember($, s, e.text);
+      else {
+        // A notification, a scheduled prompt or an image alone: a user turn Creole leaves out on purpose.
+        const sid = await $.session.id();
+        s.unkept.set(sid, (s.unkept.get(sid) ?? 0) + 1);
+      }
+    } catch (err) {
+      hookError($, err);
+    }
+    return next(e);
+  });
+
+  // A model at low effort can edit past the user's constraint; this check does not depend on the model.
+  // A gating hook fails open: an error in Creole's part never stops the tool.
+  on('tool.check', async ($, e, next) => {
+    try {
+      const path = EDIT_TOOLS.has(e.tool) ? (e.input?.file_path ?? e.input?.notebook_path) : null;
+      const record = typeof path === 'string' ? await sessionRecord($, await $.session.id()) : null;
+      const words = record ? heldBy(textsOf(record), path) : null;
+      if (words) return { decision: 'deny', reason: `The user said: "${words}". Skip this file and say so; a new message from the user naming it lifts this.` };
+    } catch (err) {
+      hookError($, err);
+    }
     return next(e);
   });
 
   // A subagent starts with the session graph, once there is one, and the skill's Subagents section
   // (subagentContext), after its brief: the spawn's prompt is the one context the module can give it. Its
   // answers then merge (turn.complete). A workflow's agents spawn no prompt Creole can rewrite.
+  // Fails open: a share Creole cannot build leaves the spawn as it was.
   on('agent.spawn', async ($, e, next) => {
-    const sid = s.cfg.wiki ? await $.session.id().catch(() => null) : null;
-    const record = sid ? await sessionRecord($, sid).catch(() => null) : null;
-    const share = subagentContext(s.skillText, checkGraph(record?.graph));
+    let share = null;
+    try {
+      const sid = s.cfg.wiki ? await $.session.id().catch(() => null) : null;
+      const record = sid ? await sessionRecord($, sid).catch(() => null) : null;
+      share = subagentContext(s.skillText, checkGraph(record?.graph));
+    } catch (err) {
+      hookError($, err);
+    }
     if (!share) return next(e);
     const result = await next({ ...e, prompt: `${e.prompt}\n\n${share}` });
     if (result?.agentId) s.shared.add(result.agentId);
@@ -771,8 +838,25 @@ export const register = (on, options = {}) => {
     // One at a time: a second would fork and replace the same conversation again.
     if (s.busy) return { skip: 'Creole is already compacting this conversation.' };
     s.busy = true;
+    // Fails open: an error in Creole's compaction hands it to the engine, unless the engine already ran it.
+    let passed = false;
+    let hostFailed = false;
+    let result;
+    const pass = async (x) => {
+      passed = true;
+      try {
+        return (result = await next(x));
+      } catch (err) {
+        hostFailed = true;
+        throw err;
+      }
+    };
     try {
-      return await compact($, s, e, next);
+      return await compact($, s, e, pass);
+    } catch (err) {
+      if (hostFailed) throw err;
+      hookError($, err);
+      return passed ? result : next(e);
     } finally {
       s.busy = false;
     }
@@ -782,25 +866,30 @@ export const register = (on, options = {}) => {
   // compaction's observed end: Claude Code 2.1.292 appends it as the engine's note (its boundary notice
   // comes by the compaction door), a row that carries the graph. One never seen kept stays issued,
   // unverified, and is not counted.
+  // Fails open: after the append has run, an error in Creole's bookkeeping keeps the host's result.
   on('session.append', async ($, e, next) => {
     if (!e.agentId && INPUT_DOORS.has(e.door)) s.rev++;
     const result = await next(e);
-    // Claude Code 2.1.292 fires session.measure only after a turn, and a turn can read past the limit
-    // after a compaction that left it below: disarmed, each main response reads the usage, which by
-    // then counts the call before it (none yet at a turn's first response after a compaction).
-    if (!s.armed && !e.agentId && e.door === 'response') {
-      const tokens = (await $.session.usage().catch(() => null))?.context.tokens;
-      if (tokens > 0 && tokens < limitOf(s)) {
-        s.armed = true;
-        await retarget($, s);
+    try {
+      // Claude Code 2.1.292 fires session.measure only after a turn, and a turn can read past the limit
+      // after a compaction that left it below: disarmed, each main response reads the usage, which by
+      // then counts the call before it (none yet at a turn's first response after a compaction).
+      if (!s.armed && !e.agentId && e.door === 'response') {
+        const tokens = (await $.session.usage().catch(() => null))?.context.tokens;
+        if (tokens > 0 && tokens < limitOf(s)) {
+          s.armed = true;
+          await retarget($, s);
+        }
       }
+      if (e.agentId || e.door !== 'note' || e.origin?.kind !== 'engine' || !s.issued) return result;
+      const text = (e.message?.content ?? [])
+        .filter((b) => b?.type === 'text')
+        .map((b) => b.text)
+        .join('\n');
+      if (text.includes(s.issued.rendered)) await committed($, s).catch(() => {});
+    } catch (err) {
+      hookError($, err);
     }
-    if (e.agentId || e.door !== 'note' || e.origin?.kind !== 'engine' || !s.issued) return result;
-    const text = (e.message?.content ?? [])
-      .filter((b) => b?.type === 'text')
-      .map((b) => b.text)
-      .join('\n');
-    if (text.includes(s.issued.rendered)) await committed($, s).catch(() => {});
     return result;
   });
 

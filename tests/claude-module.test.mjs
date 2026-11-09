@@ -14,16 +14,17 @@ const ROOT = new URL('..', import.meta.url).pathname.replace(/\/$/, '');
 const WIKI = 'wiki-v4:/work/app';
 const PROFILE = 'profile-v1';
 
+// The fixtures state nothing verbatim (no quote, code span or path), so they ground in any conversation;
+// grounding has tests of its own.
 const GRAPH = `<!-- creole graph v2 · pass 1 · 2026-10-12T01:00:00Z · 70000 tokens -->
 T: Port the CLI to Rust
-C1: "no async runtime"
-B1: \`src/args.rs\`: clap parser
+B1: argument parsing with clap
 S1: config loading | in progress | remaining: env overrides
 L: Argument parser done`;
 
 const DELTA = `<!-- creole delta v2 · pass 2 · 2026-10-12T02:00:00Z · 71000 tokens -->
 - S1
-+ B2: \`src/config.rs\`: config loading with env overrides
++ B2: config loading with env overrides
 L: Config loading done`;
 
 // store: the plugin's $.store, shared between setups to model sessions of one project.
@@ -164,7 +165,7 @@ test('module: CREOLE_LANGUAGE is read at session start; a running session keeps 
 });
 
 test('module: the fork reads the graph instructions without the Language section, on the retry too, the language on or off', async () => {
-  const invalid = GRAPH.replace('C1: "no async runtime"', 'C1: no async runtime');
+  const invalid = GRAPH.replace('L: Argument parser done', 'H1: stale cache\nL: Argument parser done');
   for (const env of [{ CREOLE_LANGUAGE: 'off' }, {}]) {
     const { fire, calls } = setup({ env, replies: [answer(invalid), answer(GRAPH)] });
     await fire('session.start', {});
@@ -348,6 +349,17 @@ test('module: a compaction 24 or more responses after the last shrinks a grown h
   await compact(24, 40000);
 });
 
+test('module: gating hooks fail open: an event in a shape Creole cannot read still reaches the host unchanged', async () => {
+  const { fire, calls } = setup({ replies: [answer(GRAPH)] });
+  const prompt = { origin: { kind: 'composer' } }; // no text: an attachment-only prompt
+  assert.deepEqual(await fire('prompt.submit', prompt), { next: prompt });
+  const odd = { trigger: 'manual', messages: null }; // a host whose compaction event changed shape
+  assert.deepEqual(await fire('session.compact', odd), { next: odd }, 'the engine compacts instead');
+  assert.ok(calls.logs.some((l) => /^creole-hook-error /.test(l)), 'the error goes to the debug log');
+  const spawn = { prompt: 'review', agentType: 'general' };
+  assert.deepEqual(await fire('agent.spawn', spawn), { next: spawn }, 'no graph yet: the spawn as it was');
+});
+
 test('module: the fork writes the full graph, which replaces the conversation', async () => {
   const { fire, calls } = setup({ replies: [answer(`Here it is.\n\n${GRAPH}`)], usage: { tokens: 70000, window: 200000 } });
   const messages = [msg('user', 'Port the CLI to Rust, no async runtime'), msg('assistant', 'Working on config loading now.')];
@@ -398,13 +410,31 @@ test('module: with a stored graph the fork writes a delta against it, shown in i
   const graph = parseGraph(r.messages[0].text);
   assert.equal(graph.pass, 2);
   assert.equal(graph.nodes.S1, undefined);
-  assert.equal(graph.nodes.C1.text, '"no async runtime"');
+  assert.equal(graph.nodes.B1.text, 'argument parsing with clap', 'unchanged rows carry over');
+  assert.equal(graph.nodes.B2.text, 'config loading with env overrides');
+});
+
+test('module: a graph that states what the conversation does not hold is repaired once, then refused; nothing made up is stored or restored', async () => {
+  const made = GRAPH.replace('B1: argument parsing with clap', 'B1: `src/argv.rs`: argument parsing with clap');
+  const messages = [msg('user', 'Port the CLI to Rust'), msg('assistant', 'Reading src/main.rs')];
+  const fixed = setup({ replies: [answer(made), answer(GRAPH)] });
+  const r = await fixed.fire('session.compact', { trigger: 'auto', messages });
+  assert.match(fixed.calls.forks[1], /It needs fixing:\n- B1: not in the conversation: "src\/argv\.rs"/);
+  assert.equal(parseGraph(r.messages[0].text).nodes.B1.text, 'argument parsing with clap');
+  const store = new Map();
+  const stuck = setup({ store, replies: [answer(made), answer(made)] });
+  const e = { trigger: 'auto', messages };
+  assert.deepEqual(await stuck.fire('session.compact', e), fallback(e), 'the engine compacts, told to keep the user\'s words');
+  assert.equal(store.get('user:s1')?.graph, undefined, 'the made-up graph is never stored');
+  const real = GRAPH.replace('B1: argument parsing with clap', 'B1: `src/main.rs`: argument parsing with clap');
+  const grounded = setup({ replies: [answer(real)] });
+  assert.equal(parseGraph((await grounded.fire('session.compact', { trigger: 'auto', messages })).messages[0].text).nodes.B1.text, '`src/main.rs`: argument parsing with clap', 'a path the conversation shows is kept');
 });
 
 test('module: one retry with the errors, then the engine compacts instead', async () => {
-  const fixed = setup({ replies: [answer(GRAPH.replace('C1: "no async runtime"', 'C1: no async runtime')), answer(GRAPH)] });
+  const fixed = setup({ replies: [answer(GRAPH.replace('L: Argument parser done', 'H1: stale cache\nL: Argument parser done')), answer(GRAPH)] });
   const r = await fixed.fire('session.compact', { trigger: 'auto', messages: [msg('user', 'go')] });
-  assert.match(fixed.calls.forks[1], /It needs fixing:\n- C1: a constraint is the user's exact words/);
+  assert.match(fixed.calls.forks[1], /It needs fixing:\n- H1: a hypothesis must link to its issue/);
   assert.equal(parseGraph(r.messages[0].text).pass, 1);
 
   const broken = setup({ replies: [answer('no graph'), answer('still none')] });
@@ -759,17 +789,18 @@ test('module: the project wikis and profile earlier versions kept are neither re
 const NOW = Date.parse('2026-10-12T03:00:00Z'); // the mock clock
 const DAY = 86400000;
 
-test('module: session start removes only records that ended 30 days ago, never the current, a live or an unreadable one, and none to make room', async () => {
+test('module: session start removes records untouched for 30 days, ended or killed, never the current, a recent or an unreadable one, and none to make room', async () => {
   const store = new Map([['wiki:/work/app', { lessons: {}, headroom: {}, log: [] }]]);
   store.set('user:ended', { time: NOW - 31 * DAY, ended: true, texts: ['x'] });
-  store.set('user:live', { time: NOW - 31 * DAY, texts: ['x'] }); // never ended: still running, or killed
+  store.set('user:killed', { time: NOW - 31 * DAY, texts: ['x'] }); // never ended: killed, and 30 days quiet
   store.set('user:recent', { time: NOW - 29 * DAY, ended: true, texts: ['x'] });
   store.set('user:future', { v: 2, time: NOW - 40 * DAY, ended: true, texts: ['x'] });
   store.set('user:s1', { time: NOW - 40 * DAY, ended: true, texts: ['Use pnpm'] }); // resumed at startup
   for (let i = 0; i < 120; i++) store.set(`user:recent${i}`, { time: NOW - DAY, texts: ['x'] });
   await setup({ store, session: { id: 's1', bound: false } }).fire('session.start', {});
   assert.equal(store.has('user:ended'), false);
-  for (const k of ['live', 'recent', 'future', 's1']) assert.ok(store.has(`user:${k}`), k);
+  assert.equal(store.has('user:killed'), false, 'a killed session would otherwise fill the 3 MiB for good');
+  for (const k of ['recent', 'future', 's1']) assert.ok(store.has(`user:${k}`), k);
   assert.ok(store.has('wiki:/work/app'));
   assert.deepEqual(store.get('user:s1').texts, ['Use pnpm']);
   assert.equal(store.get('user:s1').ended, undefined, 'the resumed session is live again, for other sessions\' cleanup too');
@@ -839,6 +870,40 @@ test('module: a prompt Creole keeps before the host binds the session is checked
   Object.assign(fresh, { bound: true, turns: 1 });
   assert.match((await started.fire('session.compact', e)).messages?.[0].text, /Use pnpm/);
   assert.equal(records.get('user:s1').unverified, undefined);
+});
+
+test('module: notifications and scheduled prompts are not missing messages: the session still compacts through Creole; an uncounted turn still is missing', async () => {
+  const e = { trigger: 'auto', messages: [msg('user', 'go')] };
+  const run = async (turns) => {
+    const session = { id: 's1', bound: false };
+    const t = setup({ store: new Map(), session, replies: [answer(GRAPH)] });
+    await t.fire('session.start', {});
+    await t.fire('prompt.submit', { text: 'Use pnpm', origin: { kind: 'composer' } }); // kept before the host binds
+    Object.assign(session, { bound: true, turns: 1 });
+    await t.fire('prompt.submit', { text: 'Background task done', origin: { kind: 'task-notification' } });
+    await t.fire('prompt.submit', { text: 'check the build', origin: { kind: 'scheduled-trigger' } });
+    session.turns = turns; // the host counts every user turn, these two included
+    return { t, r: await t.fire('session.compact', e) };
+  };
+  const { r } = await run(3);
+  assert.match(r.messages?.[0].text, /Use pnpm/, 'Creole compacts: nothing is missing');
+  assert.doesNotMatch(r.messages[0].text, /Background task done|check the build/, 'not the user\'s typed words');
+  const lost = await run(4); // one more turn than Creole saw: a message really is missing
+  assert.deepEqual(lost.r, fallback(e));
+  assert.match(lost.t.calls.logs.find((l) => l.startsWith('creole-fallback ')), /"reason":"incomplete"/);
+});
+
+test('module: turns Creole cannot count right now decline that compaction only; the next one, once countable, goes through Creole', async () => {
+  const e = { trigger: 'auto', messages: [msg('user', 'go')] };
+  const session = { id: 's1', bound: false };
+  const { fire, calls } = setup({ session, replies: [answer(GRAPH), answer(GRAPH)] });
+  await fire('session.start', {});
+  await fire('prompt.submit', { text: 'Use pnpm', origin: { kind: 'composer' } });
+  assert.deepEqual(await fire('session.compact', e), fallback(e), 'still unbound: not countable yet');
+  assert.match(calls.logs.find((l) => l.startsWith('creole-fallback ')), /"reason":"uncounted"/);
+  assert.doesNotMatch(calls.logs.join('\n'), /"reason":"incomplete"/);
+  Object.assign(session, { bound: true, turns: 1 });
+  assert.match((await fire('session.compact', e)).messages?.[0].text, /Use pnpm/, 'the session was never marked incomplete');
 });
 
 test('module: past 3 MiB for all sessions, a message is refused and reported; no other session goes to make room', async () => {
@@ -1310,7 +1375,24 @@ test('claude plugin validate accepts the plugin, module included, and its market
   // The root holds a marketplace, so the plugin is validated by its manifest.
   const r = spawnSync('claude', ['plugin', 'validate', `${ROOT}/.claude-plugin/plugin.json`], { encoding: 'utf8' });
   assert.equal(r.status, 0, r.stdout + r.stderr);
-  assert.match(r.stdout, /creole-module\.mjs hooks: session\.start, prompt\.compose, prompt\.context, prompt\.attachment, prompt\.submit, agent\.spawn, session\.measure, turn\.complete, session\.compact, session\.append, session\.end/);
+  assert.match(r.stdout, /creole-module\.mjs hooks: session\.start, prompt\.compose, prompt\.context, prompt\.attachment, prompt\.submit, tool\.check, agent\.spawn, session\.measure, turn\.complete, session\.compact, session\.append, session\.end/);
   const m = spawnSync('claude', ['plugin', 'validate', ROOT], { encoding: 'utf8' });
   assert.equal(m.status, 0, m.stdout + m.stderr);
 });
+
+test('module: refuses an edit to a file the user said to leave alone, quoting them; other tools and files pass', async () => {
+  const { fire } = setup();
+  await fire('session.start', {});
+  await fire('prompt.submit', { text: 'Leave pkg/util8.py alone. Fix the rest.', origin: { kind: 'composer' } });
+  const held = await fire('tool.check', { tool: 'Edit', input: { file_path: '/w/pkg/util8.py' } });
+  assert.equal(held.decision, 'deny');
+  assert.match(held.reason, /Leave pkg\/util8\.py alone\./);
+  const free = { tool: 'Edit', input: { file_path: '/w/pkg/util9.py' } };
+  assert.deepEqual(await fire('tool.check', free), { next: free });
+  const read = { tool: 'Read', input: { file_path: '/w/pkg/util8.py' } };
+  assert.deepEqual(await fire('tool.check', read), { next: read });
+  await fire('prompt.submit', { text: 'Now fix pkg/util8.py too.', origin: { kind: 'composer' } });
+  const lifted = { tool: 'Edit', input: { file_path: '/w/pkg/util8.py' } };
+  assert.deepEqual(await fire('tool.check', lifted), { next: lifted });
+});
+

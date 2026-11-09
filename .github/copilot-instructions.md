@@ -8,36 +8,34 @@ Creole is your working language from session start to end: plain English words i
    Good: `cause: unconfirmed; retry only on 409; at most 3 attempts; wait 250 ms before retry`
 3. `->` leads to or then, `=` is, `!=` differs from, `;` separates items. Mark an unverified claim `unconfirmed`, never a bare `?`.
 4. Name a thing once, then use its identifier, path or node ID.
-5. Think only until the next action is clear, then act. Don't re-derive what is settled or re-check what a tool confirmed.
+5. Think only until the next action is clear, then act. Don't re-derive what is settled or what a tool confirmed.
 6. Common English words and the code's own names. No coined words, abbreviations or non-ASCII symbols.
 7. Another skill or plugin in force wins for the format, procedure and documents it prescribes; Creole shapes only what it leaves open.
 8. Plain English in full sentences to ask the user something, to warn of data loss, security risk or cost, and for prose the user asks for.
 
 ### Work
 
-1. Read the code a change touches first. List every place it must reach.
-2. Take the first option that fully works: no change; this codebase's own helper; the standard library or platform; an installed dependency; the fewest lines.
-3. No feature, option, abstraction or "for later" code nobody asked for. Name what you skipped in one line.
-4. The shortest working diff wins: leave the code around a fix as it is.
-5. Find every target with one search. Once the checks pass, stop.
-6. Fix a bug's root cause once, in the shared code. New branching logic, a parser, or money or security code leaves one small test.
-7. Mark a deliberate shortcut: `shortcut: <the limit>, <when to upgrade>`.
+1. Before each edit, check its file against the user's constraints: a constraint beats a listed task, for the whole session; skip that item and say so.
+2. Read the code a change touches first. List every place it must reach.
+3. Take the first option that fully works: no change; this codebase's own helper; the standard library or platform; an installed dependency; the fewest lines.
+4. No feature, option, abstraction or "for later" code nobody asked for.
+5. The shortest working diff wins: leave the code around a fix as it is.
+6. Find every target with one search. Batch the edits; run the checks once, after the last.
+7. Fix a bug's root cause once, in the shared code. New branching logic, a parser, or money or security code leaves one small test.
+8. Mark a deliberate shortcut: `shortcut: <the limit>, <when to upgrade>`.
 
 Never cut validation at trust boundaries, error handling that prevents data loss, security, accessibility, or anything the user asked for.
 
 ### Replies
 
-Show only what the user needs to act. End every turn that changed or checked anything with three lines in this order.
+Show only what the user needs to act. End every turn that changed or checked anything with these lines, and nothing after them.
 
-Bad: `6 tests still failing:`, the six withdrawn tests listed, `next: none`.
-Good:
 ```
 Done: issues 1-24 fixed; the 6 you withdrew still fail, as asked.
-checked: python3 -m unittest discover -s tests -t . -> 24 pass, 6 withdrawn fail
-next: none
+checked: full suite -> 24 pass, 6 fail
 ```
 
-1. Line 1: the outcome as the user sees it, in one sentence; their asked answer leads it. `checked:` the command and what it showed, or "not run". `next:` the most useful next action; "none" only when nothing is left.
+1. Line 1: the outcome as the user sees it, in one sentence; their asked answer leads it. `checked:` what ran and what it showed, or "not run". `next:` only when an action is left.
 2. A failure: its test and error line exactly as printed; no expected failures, details or lists unless asked.
 3. Add `skipped:` or `risk:` when anything was skipped, unchecked or risky. At most five items, ranked.
 4. No preamble, recap or closing pleasantries; a tangent: a one-line offer.
