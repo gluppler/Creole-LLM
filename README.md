@@ -17,7 +17,7 @@
 
 <p align="center">
   <strong>20% to 45% lower cost than plain Claude Code</strong><br>
-  <sub>Mean over three scripted tasks, at lowest, default and max effort on Haiku 4.5, Sonnet 5.5 and Opus 5.5. One session per task and setting; all 27 Creole sessions passed their task. Claude Code 2.1.309. <a href="#numbers">Details</a>.</sub>
+  <sub>Mean over three scripted tasks, at lowest, default and max effort on Haiku 4.5, Sonnet 5.5 and Opus 5.5. One session per task and setting; all 27 Creole sessions passed their task. Claude Code 2.1.309. On Codex, Creole used more tokens than plain Codex in 7 of 9 sessions. <a href="#numbers">Details</a>.</sub>
 </p>
 
 ---
@@ -111,6 +111,8 @@ Full text in [SKILL.md](skills/creole/SKILL.md).
 
 ## Numbers
 
+### Claude Code
+
 Cost per session as Claude Code reports it, which may differ from what a subscription
 bills. Each plugin runs in its own sandbox with a pinned copy. One session per task and
 setting on Claude Code 2.1.309. Lowest is thinking off on Haiku and `--effort low`
@@ -146,9 +148,10 @@ A review with two subagents:
 | Opus 5.5 | default | **$1.200** | $1.602 | $1.913 |
 | Opus 5.5 | max | **$2.306** | $3.759 | $4.444 |
 
-Ponytail's own tasks (four small coding jobs from its benchmark, with hidden checks for
-correctness and safety): tasks passed, Python source lines changed per task with tests
-aside (Ponytail's own measure), and cost.
+Ponytail's own tasks (four small coding jobs from its benchmark, graded by its own checks:
+the rate limiter and the slug reuse by their behaviour, the CSV and JSON scripts only by
+whether a Python file was written and compiles): tasks passed, Python source lines changed
+per task with tests aside (Ponytail's own measure), and cost.
 
 | Model | Effort | Creole passed | native passed | Ponytail passed | Creole lines | native lines | Ponytail lines | Creole cost | native cost | Ponytail cost |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -190,12 +193,96 @@ plugin better):
 - Not tested: Fable 5.1, which needs usage credits. Not shown: lower cost on every kind
   of task, public benchmark scores, or five hours of maximum-effort work.
 
+### Codex
+
+Tokens per session as Codex records them, cache reads included. The account is a
+subscription and reports no dollar figure, so no cost is shown. Same tasks, oracles and
+pinned plugins as on Claude Code; one session per task and arm at the lowest effort
+(`low`) on GPT-6.1-Sol, GPT-6-Astra and GPT-6.1-Terra; Codex CLI 0.167.0 and 0.169.0.
+All 75 sessions ran to the end.
+
+<p align="center"><img src="assets/numbers-codex.svg" alt="Tokens per session on Codex at the lowest effort for Creole, plain Codex and each compared plugin, by model. The tables below hold the same numbers."></p>
+
+Creole against plain Codex, task by task:
+
+| Model | Task | Codex CLI | Creole | native | Creole against native |
+|---|---|---|---|---|---|
+| GPT-6.1-Sol | bugfix-two | 0.167.0 | 105,989 | 88,938 | +19.2% |
+| GPT-6.1-Sol | bugfix-review | 0.167.0 | 392,943 | 313,906 | +25.2% |
+| GPT-6.1-Sol | review-subagents | 0.167.0 | 796,468 | 652,567 | +22.1% |
+| GPT-6-Astra | bugfix-two | 0.167.0 | 109,721 | 102,810 | +6.7% |
+| GPT-6-Astra | bugfix-review | 0.167.0 | 350,962 | 314,967 | +11.4% |
+| GPT-6-Astra | review-subagents | 0.169.0 / 0.167.0 | 779,134 | 579,549 | +34.4% |
+| GPT-6.1-Terra | bugfix-two | 0.169.0 | 72,471 | 80,250 | -9.7% |
+| GPT-6.1-Terra | bugfix-review | 0.169.0 | 448,166 | 297,071 | +50.9% |
+| GPT-6.1-Terra | review-subagents | 0.169.0 | 644,957 | 717,191 | -10.1% |
+
+Bug fixes, the mean of the short fix and the review (fewest in bold):
+
+| Model | Creole | native | Ponytail | i-have-adhd | Caveman |
+|---|---|---|---|---|---|
+| GPT-6.1-Sol | 249k | **201k** | 248k | 297k | 251k |
+| GPT-6-Astra | 230k | 209k | **200k** | 259k | 251k |
+| GPT-6.1-Terra | 260k | **189k** | 248k | 261k | 247k |
+
+A review with two subagents:
+
+| Model | Creole | native | llm-wiki | Creole deltas merged |
+|---|---|---|---|---|
+| GPT-6.1-Sol | 796k | **653k** | 780k | 2 of 2 |
+| GPT-6-Astra | 779k | **580k** | 815k | 1 of 2 |
+| GPT-6.1-Terra | **645k** | 717k | 732k | 2 of 2 |
+
+Ponytail's own tasks: tasks passed, then source lines changed and tokens per task over
+the tasks all three arms passed (like for like).
+
+| Model | Creole passed | native passed | Ponytail passed | Tasks all passed | Creole lines | native lines | Ponytail lines | Creole tokens | native tokens | Ponytail tokens |
+|---|---|---|---|---|---|---|---|---|---|---|
+| GPT-6.1-Sol | 3/4 | 4/4 | 4/4 | 3 | 36.0 | 39.3 | 38.3 | 56k | 52k | 55k |
+| GPT-6-Astra | 3/4 | 4/4 | 4/4 | 3 | 35.3 | 42.3 | 36.3 | 56k | 52k | 54k |
+| GPT-6.1-Terra | 4/4 | 4/4 | 4/4 | 4 | 37.3 | 43.8 | 25.5 | 65k | 55k | 79k |
+
+Against each plugin at its own thing, across the three models (Creole better / tied /
+plugin better):
+
+| Plugin | Its own thing, as measured | Result | Tokens |
+|---|---|---|---|
+| Ponytail | source lines changed, on Ponytail's own tasks | 2 / 0 / 1 | 1 / 0 / 2 |
+| Ponytail | lines per fix, on the bug fixes | 0 / 3 / 0 | 0 / 0 / 3 |
+| i-have-adhd | words in the final reply | 0 / 0 / 3 | 3 / 0 / 0 |
+| Caveman | output tokens | 1 / 0 / 2 | 2 / 0 / 1 |
+| llm-wiki | subagent session passing its task and hard rules | 0 / 3 / 0 | 2 / 0 / 1 |
+
+- The Claude Code savings did not carry over. Creole used more tokens than plain Codex
+  in 7 of 9 sessions (6 of the 8 run on one CLI version), and over the three tasks 6.5%
+  to 24.3% more at every model. On Codex a hook cannot remove history: Codex compacts
+  with its own summary and Creole restores its graph after it, so the language and the
+  graph are added to the context instead of replacing it.
+- Every Creole bug-fix and subagent session passed and broke no hard rule (9 of 9), and
+  5 of its 6 subagent deltas were merged exactly (the sixth subagent's final update was
+  not recorded).
+- Creole failed 2 of Ponytail's 12 tasks: on GPT-6.1-Sol and GPT-6-Astra it put the JSON
+  configuration loader in its reply and wrote no file. Native and Ponytail passed all 12.
+- Replies to the review's last question: every arm gave the right failing-test count in
+  the first line and named the cause. Creole showed the tests run in 3 of 3 and every other
+  arm in 2 of 3, but its replies were the longest, 26 words on average against 18 for
+  i-have-adhd.
+- Lifecycle on all ten models the account offered: 118 of 120 checks passed (usage read,
+  one language section per prompt, the graph stored and restored after Codex's own
+  compaction, a resume restoring once, language off, wiki off, graph-shaped user text kept
+  as data). Two failed, both at a second compaction: on GPT-6-Luna the restored graph lacked
+  a corrected rate and a reopened issue; on GPT-6-Sol it held both, but it was a full graph
+  two passes on instead of the expected single delta.
+- Not run: default and highest effort, and the comparison on the seven other models (two
+  GPT-6-Sol sessions aside); the collection stopped at the account's usage limits. Not
+  shown: cost in dollars.
+
 ## Support
 
 | Agent | Route | Tier |
 |---|---|---|
 | Claude Code 2.1.309 | function hooks (`hooks/creole-module.mjs`) | live-verified |
-| Codex 0.162.1 | command hooks | mock-tested |
+| Codex CLI 0.167.0, 0.169.0 | command hooks | live-verified; 118 of 120 lifecycle checks passed |
 | omp, pi | extension (`extensions/creole.ts`) | mock-tested; no session wiki |
 | Windsurf, Cline, Kiro | their rules folders | instruction |
 | GitHub Copilot | `.github/copilot-instructions.md` | instruction |
@@ -250,6 +337,11 @@ only in its data folder, and `/creole compress` rewrites only the file you name.
 - An edit to a file the user said to leave alone is refused (Claude Code's module only;
   a clause it can't read, or a change made through a shell command, gets through).
 - The language section (about 3,500 characters) rides on every request.
+- On Codex and the other command-hook hosts, Creole cannot shrink the context; it adds the
+  graph and restores it after the host's own compaction. On Codex this cost more tokens
+  than no plugin in 7 of 9 measured sessions.
+- On Codex at the lowest effort, 2 of 12 small build tasks ended with the code in Creole's
+  reply and no file written.
 - A subagent's rows are a model's words; of two subagents changing one row, the later
   merge wins.
 - Labels around the graph and the codebase map do not stop a model from following a

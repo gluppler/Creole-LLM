@@ -41,7 +41,12 @@ unverified: with Claude Code closed, delete it by hand. See
 
 ## Codex
 
-**Tier: mock-tested** on Codex 0.162.1 (the command hooks; no live run).
+**Tier: live-verified** on Codex CLI 0.167.0 and 0.169.0 (the command hooks), on the ten
+models the test account offered: 118 of 120 lifecycle checks passed. Two failed, both at a
+second compaction (GPT-6-Luna's restored graph lacked a corrected fact; GPT-6-Sol's was a
+full graph two passes on instead of one delta). On Codex the hooks cannot remove history:
+Codex compacts with its own summary and Creole restores the graph after it. Measured
+token use: [README, Numbers](README.md#codex).
 
 ```sh
 git clone https://github.com/gluppler/Creole-LLM
@@ -213,7 +218,7 @@ rules it started with.
 | Claude Code | `claude plugin marketplace update creole-llm`, then `claude plugin update creole@creole-llm`, then restart Claude Code |
 | Codex | `git -C /path/to/Creole-LLM pull`, then `codex plugin remove creole@creole-llm` and `codex plugin add creole@creole-llm` |
 | omp, pi | `git -C /path/to/Creole-LLM pull`; omp also has `omp plugin upgrade` |
-| OpenCode | `npm update creole-llm`, or pin `"creole-llm@1.0.3"` in `opencode.json`; a clone: `git pull` |
+| OpenCode | `npm update creole-llm`, or pin `"creole-llm@2.0.0"` in `opencode.json`; a clone: `git pull` |
 | npm | `npm install creole-llm@latest` |
 | Skills CLI | `npx skills update creole` (same `--agent` and `--global` flags as the install) |
 | Copilot CLI, Devin CLI, Grok Build, Cursor and Qoder plugins | uninstall and install again with the commands above; the host's own update command works too where it has one |
